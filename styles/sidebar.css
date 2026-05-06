@@ -1,0 +1,305 @@
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-top: 2px;
+}
+
+/* ============ SEARCH BOX ============ */
+.search-box {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.search-input-wrap:focus-within {
+  border-color: var(--red);
+}
+
+.search-input {
+  flex: 1;
+  font-size: 13px;
+  background: none;
+}
+
+.new-case-btn {
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--red);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, opacity 0.2s;
+  box-shadow: 0 2px 8px rgba(223, 41, 38, 0.2);
+}
+
+.new-case-btn:hover { opacity: 0.9; }
+.new-case-btn:active { transform: scale(0.96); }
+
+/* ============ CHAT LIST ============ */
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.chat-list::-webkit-scrollbar { width: 6px; }
+.chat-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.chat-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 2px;
+}
+
+.chat-item:hover { background: var(--surface-2); }
+
+.chat-item.active {
+  background: var(--red-soft);
+}
+
+[data-theme="dark"] .chat-item.active {
+  background: var(--surface-2);
+  border-left: 3px solid var(--red);
+  padding-left: 9px;
+}
+
+.chat-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.chat-item-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chat-item-time {
+  font-size: 11px;
+  color: var(--text-mute);
+}
+
+.chat-item-title {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-item-preview {
+  font-size: 12px;
+  color: var(--text-mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============ VIEW TABS ============ */
+.view-tabs {
+  display: flex;
+  padding: 8px 12px 0;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.view-tab {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mute);
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.view-tab:hover { color: var(--text); }
+.view-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--red);
+}
+
+.view-tab-count {
+  font-size: 11px;
+  background: var(--surface-2);
+  color: var(--text-soft);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  min-width: 20px;
+}
+
+.view-tab.active .view-tab-count {
+  background: var(--red);
+  color: white;
+}
+
+/* ============ FOOTER + PAGINATION ============ */
+.sidebar-footer {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-pagination {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.page-btn {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  color: var(--text-soft);
+  background: var(--surface-2);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--red);
+  color: white;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sidebar-tools {
+  padding: 8px 12px;
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+/* ============ JOIN REQUESTS ============ */
+.request-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.request-row:last-child { border-bottom: none; }
+.request-row .req-info { flex: 1; min-width: 0; }
+.request-row .req-name { font-size: 13px; font-weight: 600; }
+.request-row .req-email { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+.request-row .req-actions { display: flex; gap: 4px; }
+
+.req-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.req-btn.approve { background: var(--green); color: white; }
+.req-btn.reject { background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); }
+.req-btn:hover { opacity: 0.85; }
+.req-btn:active { transform: scale(0.95); }
+
+/* ============ DISCOVER ACTION ============ */
+.discover-action {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--red);
+  color: white;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  align-self: center;
+}
+.discover-action:hover { opacity: 0.9; }
+.discover-action:disabled { background: var(--text-mute); cursor: not-allowed; }
+.discover-action.requested { background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); }
+
+/* ============ NOTIFICATIONS BUTTON ============ */
+.notif-active .icon-btn { color: var(--red); }
+#notifBtn.active { color: var(--red); position: relative; }
+#notifBtn.active::after {
+  content: "";
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+}

@@ -1,0 +1,24 @@
+.app {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: 100vh;
+  transition: grid-template-columns 0.3s;
+}
+
+.app.with-info {
+  grid-template-columns: 320px 1fr 320px;
+}
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .app.chat-open .sidebar { display: none; }
+  .app:not(.chat-open) .main { display: none; }
+  .app.with-info { grid-template-columns: 1fr; }
+  .info-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+  }
+  .app.with-info .info-panel { display: block; }
+}

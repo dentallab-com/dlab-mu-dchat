@@ -1,0 +1,201 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s, visibility 0.25s;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.95);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.show .modal { transform: scale(1); }
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-body { padding: 24px; }
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-footer .btn { width: auto; padding: 10px 20px; margin: 0; }
+
+/* ============ FORM ============ */
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-soft);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group label .optional {
+  color: var(--text-mute);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ============ EMAIL TAG INPUT ============ */
+.email-tag-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  min-height: 48px;
+}
+
+.email-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--red-soft);
+  color: var(--red-dark);
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .email-tag { background: var(--surface-2); color: var(--red); }
+
+.email-tag button {
+  color: inherit;
+  opacity: 0.6;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.email-tag button:hover { opacity: 1; }
+
+.email-tag-input input {
+  flex: 1;
+  min-width: 120px;
+  padding: 4px;
+  font-size: 13px;
+}
+
+/* ============ EMAIL AUTOCOMPLETE ============ */
+.autocomplete-list {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 250;
+  margin-top: 4px;
+  width: calc(100% - 2px);
+}
+.autocomplete-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s;
+}
+.autocomplete-item:hover, .autocomplete-item.active { background: var(--surface-2); }
+.autocomplete-info { flex: 1; min-width: 0; }
+.autocomplete-name { font-size: 13px; font-weight: 600; }
+.autocomplete-email { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+.autocomplete-tag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.autocomplete-tag.existing { background: var(--surface-2); color: var(--green); }
+.autocomplete-tag.external { background: var(--red-soft); color: var(--red-dark); }
+[data-theme="dark"] .autocomplete-tag.external { background: var(--surface-2); color: var(--red); }
+
+/* ============ WHITELIST ROW ============ */
+.whitelist-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.whitelist-row:last-child { border-bottom: none; }
+.whitelist-info { flex: 1; min-width: 0; }
+.whitelist-email {
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.whitelist-meta {
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-top: 2px;
+}
+.whitelist-remove {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  color: var(--text-mute);
+  transition: background 0.15s, color 0.15s;
+}
+.whitelist-remove:hover { background: var(--red-soft); color: var(--red); }
+
+/* ============ SESSION WARNING ============ */
+.session-warning {
+  background: var(--red-soft);
+  color: var(--red-dark);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+[data-theme="dark"] .session-warning { background: var(--surface-2); color: var(--red); }

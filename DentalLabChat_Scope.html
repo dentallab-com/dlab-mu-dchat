@@ -457,7 +457,7 @@
     <div>
       <div class="masthead-meta">
         <span class="dot"></span>
-        <span>Project Scope · v1.2 · Light</span>
+        <span>Project Scope · v1.3 · Light</span>
       </div>
       <h1>Dental Lab<br><em>Case Chat.</em></h1>
     </div>
@@ -553,6 +553,9 @@
         <ul>
           <li>Text messages</li>
           <li>File attachments via S3 (PDF, Images, Videos) — 25MB limit</li>
+          <li>Drag &amp; drop file upload</li>
+          <li>Quote / Reply to a specific message</li>
+          <li>@Mention members (autocomplete from group)</li>
         </ul>
       </div>
 
@@ -565,6 +568,7 @@
           <li>List of joined chats</li>
           <li>Search by Case ID</li>
           <li>Pagination (10 chats at a time)</li>
+          <li>Unread message count badge per chat</li>
         </ul>
       </div>
 
@@ -586,6 +590,7 @@
         <ul>
           <li>Case details: Case ID, Title, Patient Name, Doctor Name</li>
           <li>Member list</li>
+          <li>File gallery — grouped view of all files shared in the case</li>
         </ul>
       </div>
 
@@ -595,7 +600,7 @@
           <h3 class="feat-title">Roles &amp; Permissions</h3>
         </div>
         <ul>
-          <li><strong>Admin:</strong> create case, edit case details, delete entire group, manage members, manage whitelist</li>
+          <li><strong>Admin:</strong> create case, edit case details, delete entire group, manage members, kick / remove users, manage whitelist</li>
           <li><strong>Regular user:</strong> join, send messages &amp; files</li>
         </ul>
       </div>
@@ -603,6 +608,18 @@
       <div class="feat">
         <div class="feat-head">
           <span class="feat-num">10</span>
+          <h3 class="feat-title">Case Status Indicators</h3>
+        </div>
+        <ul>
+          <li>Workflow tags per case (e.g., Impression Received, In Production, Awaiting Approval, Shipped)</li>
+          <li>Admin sets &amp; updates status</li>
+          <li>Status visible on Chat Dashboard and Group Info Screen</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">11</span>
           <h3 class="feat-title">UI / Other</h3>
         </div>
         <ul>
@@ -627,15 +644,11 @@
       <div class="excluded-group">
         <h3>Messaging</h3>
         <ul>
-          <li>Quote / Reply</li>
-          <li>@Mention</li>
           <li>Emoji reactions</li>
           <li>Typing indicator</li>
           <li>Read receipts / Seen by</li>
           <li>Individual message edit / delete</li>
           <li>Message forwarding</li>
-          <li>Drag &amp; drop upload</li>
-          <li>File gallery</li>
           <li>Bookmark / Star messages</li>
         </ul>
       </div>
@@ -646,11 +659,8 @@
           <li>Online / Offline / Last Seen status</li>
           <li>Pin chats</li>
           <li>Chat filters (All, Muted, Pinned)</li>
-          <li>Unread message count badge</li>
           <li>Favorites</li>
           <li>Users leaving groups voluntarily</li>
-          <li>Admin kick / remove user</li>
-          <li>Case status indicators</li>
           <li>Auto-archive of inactive cases</li>
         </ul>
       </div>
@@ -701,6 +711,7 @@
           <li>Member add + invitation flow</li>
           <li>External user whitelist flow</li>
           <li>Messaging (text + file)</li>
+          <li>Drag &amp; drop file upload</li>
           <li>Group Info Screen</li>
         </ul>
       </div>
@@ -709,11 +720,15 @@
         <div class="phase-meta">
           <div class="phase-num">Phase 02</div>
           <div class="phase-name">Discovery &amp; Experience</div>
-          <div class="phase-desc">Open the system up. Self-service join flow, notifications, and theming.</div>
+          <div class="phase-desc">Open the system up. Richer messaging, self-service join, notifications, and theming.</div>
         </div>
         <ul class="phase-items">
           <li>Join request + admin approval</li>
           <li>Pagination</li>
+          <li>Quote / Reply</li>
+          <li>@Mention members</li>
+          <li>Unread message count badge</li>
+          <li>File gallery in Group Info</li>
           <li>Push notifications</li>
           <li>Dark Mode</li>
         </ul>
@@ -723,10 +738,12 @@
         <div class="phase-meta">
           <div class="phase-num">Phase 03</div>
           <div class="phase-name">Advanced</div>
-          <div class="phase-desc">Admin tooling and security hardening to close out the build.</div>
+          <div class="phase-desc">Workflow, admin tooling, and security hardening to close out the build.</div>
         </div>
         <ul class="phase-items">
+          <li>Case status indicators</li>
           <li>Admin edit case details</li>
+          <li>Admin kick / remove user</li>
           <li>Admin delete entire chat group</li>
           <li>Single device login enforcement</li>
         </ul>
