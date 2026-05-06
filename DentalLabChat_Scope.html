@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dental Lab Case Chat — Project Scope</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=DM+Sans:opsz,wght@9..40,300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1C1C1C;
+    --ink-soft: #444444;
+    --ink-mute: #8A8A8A;
+    --rule: #E8E5DF;
+    --paper: #F7F4ED;
+    --paper-warm: #FBF8F1;
+    --red: #DF2926;
+    --red-deep: #A2171B;
+    --red-bright: #FC2C22;
+    --green-ok: #2D6A4F;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(223, 41, 38, 0.04), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(28, 28, 28, 0.03), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 60px 48px 100px;
+  }
+
+  /* ===== HEADER ===== */
+  .masthead {
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 28px;
+    margin-bottom: 56px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 32px;
+  }
+
+  .masthead-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .masthead-meta .dot {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 68px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    font-variation-settings: "SOFT" 30, "opsz" 144;
+  }
+
+  .masthead h1 em {
+    font-style: italic;
+    color: var(--red);
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+  }
+
+  .masthead-tag {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.1em;
+  }
+
+  .masthead-tag strong {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+    margin-top: 4px;
+  }
+
+  /* ===== TOC / NAV ===== */
+  .toc {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--ink);
+    margin-bottom: 72px;
+    background: var(--paper-warm);
+  }
+
+  .toc a {
+    padding: 22px 24px;
+    text-decoration: none;
+    color: var(--ink);
+    border-right: 1px solid var(--ink);
+    transition: background 0.2s, color 0.2s;
+    display: block;
+  }
+
+  .toc a:last-child { border-right: none; }
+
+  .toc a:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .toc a:hover .toc-num { color: var(--red-bright); }
+
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+
+  .toc-label {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section {
+    margin-bottom: 96px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    align-items: baseline;
+    gap: 24px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 40px;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--red);
+    letter-spacing: 0.1em;
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 44px;
+    letter-spacing: -0.02em;
+    font-variation-settings: "SOFT" 30, "opsz" 144;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--red);
+  }
+
+  .section-intro {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: 48px;
+    font-style: italic;
+  }
+
+  /* ===== IN SCOPE — feature blocks ===== */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+
+  .feat {
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 28px 28px 32px;
+    background: var(--paper-warm);
+    position: relative;
+    transition: background 0.25s;
+  }
+
+  .feat:hover { background: #fff; }
+
+  .feat-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  .feat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .feat-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .feat ul {
+    list-style: none;
+  }
+
+  .feat li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .feat li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--red);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  /* ===== OUT OF SCOPE ===== */
+  .excluded-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .excluded-group {
+    border-top: 1px solid var(--ink);
+    padding-top: 20px;
+  }
+
+  .excluded-group h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .excluded-group ul {
+    list-style: none;
+  }
+
+  .excluded-group li {
+    font-size: 15px;
+    line-height: 1.45;
+    padding: 8px 0;
+    color: var(--ink-mute);
+    border-bottom: 1px dashed var(--rule);
+    text-decoration: line-through;
+    text-decoration-color: rgba(223, 41, 38, 0.4);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  /* ===== PHASE PLAN ===== */
+  .phases {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .phase {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 40px;
+    padding: 32px;
+    background: var(--paper-warm);
+    border: 1px solid var(--ink);
+    position: relative;
+  }
+
+  .phase::before {
+    content: "";
+    position: absolute;
+    left: -1px; top: -1px; bottom: -1px;
+    width: 6px;
+    background: var(--red);
+  }
+
+  .phase-meta {
+    border-right: 1px solid var(--rule);
+    padding-right: 32px;
+  }
+
+  .phase-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .phase-name {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .phase-desc {
+    font-size: 13px;
+    color: var(--ink-mute);
+    line-height: 1.5;
+  }
+
+  .phase-items {
+    list-style: none;
+    columns: 2;
+    column-gap: 32px;
+  }
+
+  .phase-items li {
+    font-size: 14.5px;
+    padding: 8px 0 8px 22px;
+    position: relative;
+    line-height: 1.4;
+    break-inside: avoid;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  .phase-items li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    color: var(--green-ok);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 2px solid var(--ink);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .footer-block strong {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+
+  .footer-block p { line-height: 1.55; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .page { padding: 32px 20px 60px; }
+    .masthead {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .masthead-tag { text-align: left; }
+    .toc { grid-template-columns: 1fr; }
+    .toc a {
+      border-right: none;
+      border-bottom: 1px solid var(--ink);
+    }
+    .toc a:last-child { border-bottom: none; }
+    .section-head {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+    .section-title { font-size: 32px; }
+    .features { grid-template-columns: 1fr; }
+    .excluded-grid { grid-template-columns: 1fr; }
+    .phase {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .phase-meta {
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding-right: 0;
+      padding-bottom: 20px;
+    }
+    .phase-items { columns: 1; }
+    .footer { grid-template-columns: 1fr; }
+  }
+
+  /* ===== PRINT ===== */
+  @media print {
+    body { background: white; }
+    .page { padding: 20px; }
+    .feat:hover, .toc a:hover { background: inherit; color: inherit; }
+    .section { page-break-inside: avoid; }
+    .phase { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== MASTHEAD ===== -->
+  <header class="masthead">
+    <div>
+      <div class="masthead-meta">
+        <span class="dot"></span>
+        <span>Project Scope · v1.2 · Light</span>
+      </div>
+      <h1>Dental Lab<br><em>Case Chat.</em></h1>
+    </div>
+    <div class="masthead-tag">
+      Web · PWA<br>
+      <strong>1 Senior Fullstack Developer</strong>
+      Generated · May 2026
+    </div>
+  </header>
+
+  <!-- ===== TOC ===== -->
+  <nav class="toc">
+    <a href="#in-scope">
+      <span class="toc-num">01 / IN</span>
+      <span class="toc-label">In Scope</span>
+    </a>
+    <a href="#out-scope">
+      <span class="toc-num">02 / OUT</span>
+      <span class="toc-label">Out of Scope</span>
+    </a>
+    <a href="#phases">
+      <span class="toc-num">03 / PLAN</span>
+      <span class="toc-label">Phase Plan</span>
+    </a>
+  </nav>
+
+  <!-- ===== IN SCOPE ===== -->
+  <section class="section" id="in-scope">
+    <div class="section-head">
+      <div class="section-num">§ 01</div>
+      <h2 class="section-title">In <em>Scope</em></h2>
+    </div>
+    <p class="section-intro">Features confirmed for this build. Everything else is excluded by design.</p>
+
+    <div class="features">
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">01</span>
+          <h3 class="feat-title">Authentication</h3>
+        </div>
+        <ul>
+          <li>OTP-based login (no password)</li>
+          <li>Restricted to @dentallab.com emails</li>
+          <li>External emails allowed only if whitelisted by admin</li>
+          <li>Non-whitelisted users see "contact admin" message</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">02</span>
+          <h3 class="feat-title">User Profile</h3>
+        </div>
+        <ul>
+          <li>Name, Profile Picture, Role, Department</li>
+          <li>Admin badge auto-assigned from env-based admin email list</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">03</span>
+          <h3 class="feat-title">Case Creation &amp; Membership</h3>
+        </div>
+        <ul>
+          <li>Admin-only case creation</li>
+          <li>Unique Case ID per case</li>
+          <li>Optional fields: Patient Name, Doctor Name, Title</li>
+          <li>Admin adds members by email (autocomplete for existing users)</li>
+          <li>Non-existing @dentallab.com users → email invite to register &amp; join</li>
+          <li>Non-existing external users → email auto-added to whitelist + invitation</li>
+          <li>Manual whitelist add by admin → triggers login/register email</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">04</span>
+          <h3 class="feat-title">Case Chat — Private Group</h3>
+        </div>
+        <ul>
+          <li>Private group per Case ID</li>
+          <li>Users can search and request to join → admin approves</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">05</span>
+          <h3 class="feat-title">Messaging</h3>
+        </div>
+        <ul>
+          <li>Text messages</li>
+          <li>File attachments via S3 (PDF, Images, Videos) — 25MB limit</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">06</span>
+          <h3 class="feat-title">Chat Dashboard</h3>
+        </div>
+        <ul>
+          <li>List of joined chats</li>
+          <li>Search by Case ID</li>
+          <li>Pagination (10 chats at a time)</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">07</span>
+          <h3 class="feat-title">Notifications</h3>
+        </div>
+        <ul>
+          <li>Push notifications via PWA</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">08</span>
+          <h3 class="feat-title">Group Info Screen</h3>
+        </div>
+        <ul>
+          <li>Case details: Case ID, Title, Patient Name, Doctor Name</li>
+          <li>Member list</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">09</span>
+          <h3 class="feat-title">Roles &amp; Permissions</h3>
+        </div>
+        <ul>
+          <li><strong>Admin:</strong> create case, edit case details, delete entire group, manage members, manage whitelist</li>
+          <li><strong>Regular user:</strong> join, send messages &amp; files</li>
+        </ul>
+      </div>
+
+      <div class="feat">
+        <div class="feat-head">
+          <span class="feat-num">10</span>
+          <h3 class="feat-title">UI / Other</h3>
+        </div>
+        <ul>
+          <li>Dark Mode</li>
+          <li>Single device login enforcement</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== OUT OF SCOPE ===== -->
+  <section class="section" id="out-scope">
+    <div class="section-head">
+      <div class="section-num">§ 02</div>
+      <h2 class="section-title">Out of <em>Scope</em></h2>
+    </div>
+    <p class="section-intro">Discussed and intentionally excluded. Not part of this delivery.</p>
+
+    <div class="excluded-grid">
+
+      <div class="excluded-group">
+        <h3>Messaging</h3>
+        <ul>
+          <li>Quote / Reply</li>
+          <li>@Mention</li>
+          <li>Emoji reactions</li>
+          <li>Typing indicator</li>
+          <li>Read receipts / Seen by</li>
+          <li>Individual message edit / delete</li>
+          <li>Message forwarding</li>
+          <li>Drag &amp; drop upload</li>
+          <li>File gallery</li>
+          <li>Bookmark / Star messages</li>
+        </ul>
+      </div>
+
+      <div class="excluded-group">
+        <h3>Chat &amp; Group</h3>
+        <ul>
+          <li>Online / Offline / Last Seen status</li>
+          <li>Pin chats</li>
+          <li>Chat filters (All, Muted, Pinned)</li>
+          <li>Unread message count badge</li>
+          <li>Favorites</li>
+          <li>Users leaving groups voluntarily</li>
+          <li>Admin kick / remove user</li>
+          <li>Case status indicators</li>
+          <li>Auto-archive of inactive cases</li>
+        </ul>
+      </div>
+
+      <div class="excluded-group">
+        <h3>Notifications</h3>
+        <ul>
+          <li>Mute toggle per chat</li>
+          <li>Advanced notification preferences</li>
+          <li>Sound toggle / desktop browser notifications</li>
+          <li>In-app notification bell with list</li>
+        </ul>
+      </div>
+
+      <div class="excluded-group">
+        <h3>System / Admin</h3>
+        <ul>
+          <li>Multi-language support</li>
+          <li>Session management view (multiple devices)</li>
+          <li>Audit log</li>
+          <li>Chat export (PDF / CSV)</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== PHASE PLAN ===== -->
+  <section class="section" id="phases">
+    <div class="section-head">
+      <div class="section-num">§ 03</div>
+      <h2 class="section-title">Phase <em>Plan</em></h2>
+    </div>
+    <p class="section-intro">Three sequential delivery phases. Earlier phases must ship before later ones begin.</p>
+
+    <div class="phases">
+
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-num">Phase 01</div>
+          <div class="phase-name">Core MVP</div>
+          <div class="phase-desc">Foundation. Auth, profile, case creation, member onboarding, and core messaging.</div>
+        </div>
+        <ul class="phase-items">
+          <li>Authentication</li>
+          <li>User Profile + Admin badge</li>
+          <li>Case Creation (admin only)</li>
+          <li>Member add + invitation flow</li>
+          <li>External user whitelist flow</li>
+          <li>Messaging (text + file)</li>
+          <li>Group Info Screen</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-num">Phase 02</div>
+          <div class="phase-name">Discovery &amp; Experience</div>
+          <div class="phase-desc">Open the system up. Self-service join flow, notifications, and theming.</div>
+        </div>
+        <ul class="phase-items">
+          <li>Join request + admin approval</li>
+          <li>Pagination</li>
+          <li>Push notifications</li>
+          <li>Dark Mode</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-meta">
+          <div class="phase-num">Phase 03</div>
+          <div class="phase-name">Advanced</div>
+          <div class="phase-desc">Admin tooling and security hardening to close out the build.</div>
+        </div>
+        <ul class="phase-items">
+          <li>Admin edit case details</li>
+          <li>Admin delete entire chat group</li>
+          <li>Single device login enforcement</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-block">
+      <strong>Team</strong>
+      <p>1 senior fullstack developer using Claude Code AI. Frontend generated via Vibe code based on Swagger API documentation.</p>
+    </div>
+    <div class="footer-block">
+      <strong>Document</strong>
+      <p>This is a working scope. Anything not listed in §01 In Scope is implicitly out of scope, regardless of whether §02 lists it.</p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

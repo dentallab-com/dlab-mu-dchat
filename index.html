@@ -1,0 +1,3278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dental Lab Case Chat — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --surface-2: #F4F3EE;
+    --border: #E5E3DD;
+    --text: #1C1C1C;
+    --text-soft: #555555;
+    --text-mute: #9A9A95;
+    --red: #DF2926;
+    --red-soft: #FEEDEC;
+    --red-dark: #A2171B;
+    --green: #2D6A4F;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+    --radius: 12px;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0F0F0F;
+    --surface: #1A1A1A;
+    --surface-2: #242424;
+    --border: #2E2E2E;
+    --text: #F0F0F0;
+    --text-soft: #B0B0B0;
+    --text-mute: #707070;
+    --red: #FC2C22;
+    --red-soft: #2A1212;
+    --red-dark: #DF2926;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+  }
+
+  input, textarea {
+    font-family: inherit;
+    border: none;
+    outline: none;
+    background: none;
+    color: inherit;
+  }
+
+  /* ============ LOGIN SCREEN ============ */
+  .login {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.5s, visibility 0.5s;
+  }
+
+  .login.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .login-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .login-bg::before {
+    content: "";
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--red) 0%, transparent 70%);
+    opacity: 0.12;
+    top: -200px; right: -200px;
+    animation: float 10s ease-in-out infinite;
+  }
+
+  .login-bg::after {
+    content: "";
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--red) 0%, transparent 70%);
+    opacity: 0.08;
+    bottom: -150px; left: -150px;
+    animation: float 14s ease-in-out infinite reverse;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(40px, -30px); }
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .brand-logo {
+    width: 40px; height: 40px;
+    background: var(--red);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(223, 41, 38, 0.25);
+  }
+
+  .brand-text {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .brand-text small {
+    display: block;
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .login h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+
+  .login p.sub {
+    color: var(--text-soft);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: var(--surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-field:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(223, 41, 38, 0.1);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--text);
+    color: var(--bg);
+    font-weight: 600;
+    font-size: 15px;
+    transition: transform 0.1s, opacity 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--red);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .otp-container {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin: 20px 0 28px;
+  }
+
+  .otp-input {
+    width: 52px;
+    height: 56px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  }
+
+  .otp-input:focus {
+    border-color: var(--red);
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(223, 41, 38, 0.1);
+  }
+
+  .otp-info {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .otp-info b { color: var(--text); }
+
+  .otp-resend {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 16px;
+    color: var(--text-soft);
+  }
+
+  .otp-resend button {
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: 100vh;
+    transition: grid-template-columns 0.3s;
+  }
+
+  .app.with-info {
+    grid-template-columns: 320px 1fr 320px;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .avatar.lg { width: 64px; height: 64px; font-size: 22px; }
+  .avatar.sm { width: 28px; height: 28px; font-size: 11px; }
+
+  .user-name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .user-role {
+    font-size: 11px;
+    color: var(--text-mute);
+    margin-top: 2px;
+  }
+
+  .admin-badge {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  .icon-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-soft);
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .icon-btn:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .search-box {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .search-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .search-input-wrap:focus-within {
+    border-color: var(--red);
+  }
+
+  .search-input {
+    flex: 1;
+    font-size: 13px;
+    background: none;
+  }
+
+  .new-case-btn {
+    padding: 10px;
+    border-radius: 8px;
+    background: var(--red);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, opacity 0.2s;
+    box-shadow: 0 2px 8px rgba(223, 41, 38, 0.2);
+  }
+
+  .new-case-btn:hover { opacity: 0.9; }
+  .new-case-btn:active { transform: scale(0.96); }
+
+  .chat-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+  }
+
+  .chat-list::-webkit-scrollbar { width: 6px; }
+  .chat-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  .chat-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 2px;
+  }
+
+  .chat-item:hover { background: var(--surface-2); }
+
+  .chat-item.active {
+    background: var(--red-soft);
+  }
+
+  [data-theme="dark"] .chat-item.active {
+    background: var(--surface-2);
+    border-left: 3px solid var(--red);
+    padding-left: 9px;
+  }
+
+  .chat-item-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chat-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .chat-item-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .chat-item-time {
+    font-size: 11px;
+    color: var(--text-mute);
+  }
+
+  .chat-item-title {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chat-item-preview {
+    font-size: 12px;
+    color: var(--text-mute);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .view-tabs {
+    display: flex;
+    padding: 8px 12px 0;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .view-tab {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-mute);
+    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .view-tab:hover { color: var(--text); }
+  .view-tab.active {
+    color: var(--text);
+    border-bottom-color: var(--red);
+  }
+
+  .view-tab-count {
+    font-size: 11px;
+    background: var(--surface-2);
+    color: var(--text-soft);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+    min-width: 20px;
+  }
+
+  .view-tab.active .view-tab-count {
+    background: var(--red);
+    color: white;
+  }
+
+  .sidebar-footer {
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-pagination {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-soft);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    color: var(--text-soft);
+    background: var(--surface-2);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s, color 0.15s, opacity 0.15s;
+  }
+
+  .page-btn:hover:not(:disabled) {
+    background: var(--red);
+    color: white;
+  }
+
+  .page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .sidebar-tools {
+    padding: 8px 12px;
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+
+  .request-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .request-row:last-child { border-bottom: none; }
+  .request-row .req-info { flex: 1; min-width: 0; }
+  .request-row .req-name { font-size: 13px; font-weight: 600; }
+  .request-row .req-email { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+  .request-row .req-actions { display: flex; gap: 4px; }
+  .req-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .req-btn.approve { background: var(--green); color: white; }
+  .req-btn.reject { background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); }
+  .req-btn:hover { opacity: 0.85; }
+  .req-btn:active { transform: scale(0.95); }
+
+  .discover-action {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--red);
+    color: white;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .discover-action:hover { opacity: 0.9; }
+  .discover-action:disabled { background: var(--text-mute); cursor: not-allowed; }
+  .discover-action.requested { background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); }
+
+  .file-preview {
+    background: var(--surface-2);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 0 20px 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: msgIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .file-preview-icon {
+    width: 40px; height: 40px;
+    background: var(--red-soft);
+    color: var(--red);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .file-preview-info { flex: 1; min-width: 0; }
+  .file-preview-name {
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .file-preview-size {
+    font-size: 11px;
+    color: var(--text-mute);
+    margin-top: 2px;
+  }
+  .file-preview-remove {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    color: var(--text-soft);
+    transition: background 0.15s;
+  }
+  .file-preview-remove:hover { background: var(--border); color: var(--text); }
+
+  .autocomplete-list {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 250;
+    margin-top: 4px;
+    width: calc(100% - 2px);
+  }
+  .autocomplete-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s;
+  }
+  .autocomplete-item:hover, .autocomplete-item.active { background: var(--surface-2); }
+  .autocomplete-info { flex: 1; min-width: 0; }
+  .autocomplete-name { font-size: 13px; font-weight: 600; }
+  .autocomplete-email { font-size: 11px; color: var(--text-mute); margin-top: 2px; }
+  .autocomplete-tag {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .autocomplete-tag.existing { background: var(--surface-2); color: var(--green); }
+  .autocomplete-tag.external { background: var(--red-soft); color: var(--red-dark); }
+  [data-theme="dark"] .autocomplete-tag.external { background: var(--surface-2); color: var(--red); }
+
+  .whitelist-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .whitelist-row:last-child { border-bottom: none; }
+  .whitelist-info { flex: 1; min-width: 0; }
+  .whitelist-email {
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .whitelist-meta {
+    font-size: 11px;
+    color: var(--text-mute);
+    margin-top: 2px;
+  }
+  .whitelist-remove {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    color: var(--text-mute);
+    transition: background 0.15s, color 0.15s;
+  }
+  .whitelist-remove:hover { background: var(--red-soft); color: var(--red); }
+
+  .notif-active .icon-btn { color: var(--red); }
+  #notifBtn.active { color: var(--red); position: relative; }
+  #notifBtn.active::after {
+    content: "";
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+
+  .session-warning {
+    background: var(--red-soft);
+    color: var(--red-dark);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  [data-theme="dark"] .session-warning { background: var(--surface-2); color: var(--red); }
+
+  /* ============ MAIN CHAT VIEW ============ */
+  .main {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .chat-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .chat-header-text {
+    min-width: 0;
+  }
+
+  .chat-header-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .chat-header-meta {
+    font-size: 12px;
+    color: var(--text-mute);
+    margin-top: 2px;
+  }
+
+  .chat-header-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  /* ============ MESSAGES ============ */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .messages::-webkit-scrollbar { width: 8px; }
+  .messages::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+
+  .day-divider {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 8px 0;
+    position: relative;
+  }
+
+  .day-divider::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+
+  .day-divider span {
+    background: var(--bg);
+    padding: 0 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 75%;
+    animation: msgIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.own {
+    margin-left: auto;
+    flex-direction: row-reverse;
+  }
+
+  .msg-bubble-wrap {
+    min-width: 0;
+  }
+
+  .msg-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    margin-bottom: 4px;
+    color: var(--text-mute);
+  }
+
+  .msg.own .msg-meta { justify-content: flex-end; }
+
+  .msg-meta b {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .msg-bubble {
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px 14px 14px 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: var(--shadow-sm);
+    word-wrap: break-word;
+  }
+
+  .msg.own .msg-bubble {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+    border-radius: 14px 14px 4px 14px;
+  }
+
+  .msg-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    margin-top: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .msg.own .msg-file { background: rgba(255,255,255,0.15); }
+
+  .msg-file:hover { opacity: 0.85; }
+
+  .msg-file-icon {
+    width: 36px; height: 36px;
+    background: var(--red-soft);
+    color: var(--red);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .msg.own .msg-file-icon {
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  .msg-file-info { min-width: 0; }
+  .msg-file-name {
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .msg-file-size {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  .system-msg {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-mute);
+    padding: 6px 14px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    margin: 4px auto;
+    max-width: fit-content;
+  }
+
+  /* ============ COMPOSER ============ */
+  .composer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .composer-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    font-size: 14px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+    resize: none;
+    max-height: 120px;
+    line-height: 1.4;
+  }
+
+  .composer-input:focus { border-color: var(--red); }
+
+  .send-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, opacity 0.2s;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(223, 41, 38, 0.25);
+  }
+
+  .send-btn:disabled {
+    background: var(--text-mute);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .send-btn:not(:disabled):hover { opacity: 0.9; }
+  .send-btn:not(:disabled):active { transform: scale(0.94); }
+
+  /* ============ EMPTY STATE ============ */
+  .empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .empty-icon {
+    width: 80px; height: 80px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--red);
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .empty h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .empty p {
+    color: var(--text-soft);
+    font-size: 14px;
+    max-width: 320px;
+  }
+
+  /* ============ INFO PANEL ============ */
+  .info-panel {
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    display: none;
+  }
+
+  .app.with-info .info-panel { display: block; }
+
+  .info-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .info-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .info-body { padding: 24px 20px; }
+
+  .info-hero {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-hero .avatar {
+    margin: 0 auto 12px;
+  }
+
+  .info-hero h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .info-hero p {
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+
+  .info-section {
+    margin-bottom: 24px;
+  }
+
+  .info-section h5 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 12px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 13px;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-row span:first-child { color: var(--text-soft); }
+  .info-row span:last-child {
+    font-weight: 600;
+    text-align: right;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+  }
+
+  .member-info { flex: 1; min-width: 0; }
+  .member-name { font-size: 13px; font-weight: 600; }
+  .member-role { font-size: 11px; color: var(--text-mute); }
+
+  .danger-zone {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .danger-zone-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-mute);
+    margin-bottom: 8px;
+  }
+
+  .danger-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0;
+    background: transparent;
+    color: var(--text-mute);
+    font-size: 12px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+
+  .danger-link:hover {
+    color: var(--red);
+  }
+
+  .danger-link svg {
+    width: 13px; height: 13px;
+  }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s, visibility 0.25s;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.95);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-overlay.show .modal { transform: scale(1); }
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .modal-body { padding: 24px; }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .modal-footer .btn { width: auto; padding: 10px 20px; margin: 0; }
+
+  .form-group { margin-bottom: 16px; }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .form-group label .optional {
+    color: var(--text-mute);
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .email-tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    min-height: 48px;
+  }
+
+  .email-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--red-soft);
+    color: var(--red-dark);
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  [data-theme="dark"] .email-tag { background: var(--surface-2); color: var(--red); }
+
+  .email-tag button {
+    color: inherit;
+    opacity: 0.6;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .email-tag button:hover { opacity: 1; }
+
+  .email-tag-input input {
+    flex: 1;
+    min-width: 120px;
+    padding: 4px;
+    font-size: 13px;
+  }
+
+  /* ============ TOAST ============ */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    font-size: 13px;
+    min-width: 280px;
+    max-width: 360px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .toast.success { border-left-color: var(--green); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .toast.out { animation: toastOut 0.25s forwards; }
+  @keyframes toastOut {
+    to { opacity: 0; transform: translateX(20px); }
+  }
+
+  .toast-icon {
+    color: var(--red);
+    flex-shrink: 0;
+  }
+
+  .toast.success .toast-icon { color: var(--green); }
+
+  .toast-text { flex: 1; line-height: 1.4; }
+  .toast-text b { display: block; margin-bottom: 2px; }
+
+  /* ============ DEMO BANNER ============ */
+  .demo-banner {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-md);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .demo-banner .pulse {
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  /* ============ ICONS (inline SVG helper class) ============ */
+  .icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .icon-sm { width: 14px; height: 14px; }
+  .icon-lg { width: 28px; height: 28px; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .app.chat-open .sidebar { display: none; }
+    .app:not(.chat-open) .main { display: none; }
+    .app.with-info { grid-template-columns: 1fr; }
+    .info-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+    }
+    .app.with-info .info-panel { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div class="login" id="loginScreen" style="display:none;">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-logo">DL</div>
+      <div class="brand-text">
+        Dental Lab Case Chat
+        <small>Internal Tool · v1.0</small>
+      </div>
+    </div>
+
+    <!-- Step 1: Email -->
+    <div id="loginStep1">
+      <h1>Sign in</h1>
+      <p class="sub">Enter your work email to receive a one-time code.</p>
+
+      <div class="input-group">
+        <label class="input-label">Work Email</label>
+        <input type="email" class="input-field" id="emailInput" placeholder="you@dentallab.com" value="faisal.ahmed@dentallab.com">
+      </div>
+
+      <button class="btn btn-primary" onclick="sendOtp()">Send OTP</button>
+
+      <div style="margin-top:24px; padding-top:20px; border-top:1px dashed var(--border);">
+        <p style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-mute); margin-bottom:10px;">Demo Accounts</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button class="btn btn-secondary" style="margin:0; padding:10px; font-size:12px; text-align:left;" onclick="loginAs('faisal.ahmed@dentallab.com')">
+            <b style="display:block;">Faisal Ahmed</b>
+            <span style="font-size:10px; color:var(--red); font-weight:700;">ADMIN · Lab Manager</span>
+          </button>
+          <button class="btn btn-secondary" style="margin:0; padding:10px; font-size:12px; text-align:left;" onclick="loginAs('rifat@dentallab.com')">
+            <b style="display:block;">Rifat</b>
+            <span style="font-size:10px; color:var(--text-mute); font-weight:700;">REGULAR · Technician</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="loginStep2" style="display:none;">
+      <h1>Check your email</h1>
+      <p class="sub">We sent a 6-digit code to <b id="emailEcho">faisal.ahmed@dentallab.com</b></p>
+
+      <div class="otp-container">
+        <input type="text" class="otp-input" maxlength="1" data-otp="0">
+        <input type="text" class="otp-input" maxlength="1" data-otp="1">
+        <input type="text" class="otp-input" maxlength="1" data-otp="2">
+        <input type="text" class="otp-input" maxlength="1" data-otp="3">
+        <input type="text" class="otp-input" maxlength="1" data-otp="4">
+        <input type="text" class="otp-input" maxlength="1" data-otp="5">
+      </div>
+
+      <p class="otp-info">Demo code: <b>123456</b></p>
+
+      <button class="btn btn-primary" onclick="verifyOtp()">Verify &amp; Continue</button>
+
+      <p class="otp-resend">Didn't get it? <button onclick="resendOtp()">Resend code</button></p>
+    </div>
+
+  </div>
+</div>
+<script>
+  // Reveal login immediately if no saved session, to avoid flashing it for logged-in users on reload.
+  try {
+    if (!localStorage.getItem('dchat:user')) {
+      document.getElementById('loginScreen').style.display = '';
+    }
+  } catch (e) {
+    document.getElementById('loginScreen').style.display = '';
+  }
+</script>
+
+<!-- ============ APP ============ -->
+<div class="app" id="app" style="display:none;">
+
+  <!-- ====== SIDEBAR ====== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="user-chip">
+        <div class="avatar" id="userAvatar">FA</div>
+        <div style="min-width:0;">
+          <div class="user-name">
+            <span id="userName">Faisal Ahmed</span>
+            <span class="admin-badge" id="userBadge">Admin</span>
+          </div>
+          <div class="user-role" id="userRole">Lab Manager</div>
+        </div>
+      </div>
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="themeIcon">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
+      <button class="icon-btn" onclick="logout()" title="Sign out">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search by Case ID..." id="searchInput" oninput="STATE.currentPage = 1; renderChats();">
+      </div>
+      <button class="new-case-btn" id="newCaseBtn" onclick="openNewCaseModal()" title="New Case (Admin only)">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="view-tabs">
+      <button class="view-tab active" data-view="joined" onclick="switchView('joined')">
+        <span>Joined</span>
+        <span class="view-tab-count" id="joinedCount">0</span>
+      </button>
+      <button class="view-tab" data-view="discover" id="discoverTab" onclick="switchView('discover')">
+        <span>Discover</span>
+        <span class="view-tab-count" id="discoverCount">0</span>
+      </button>
+    </div>
+
+    <div class="chat-list" id="chatList"></div>
+
+    <div class="sidebar-footer">
+      <div class="chat-pagination" id="chatPagination">
+        <button class="page-btn" id="prevPage" onclick="changePage(-1)">‹</button>
+        <span id="pageInfo">Page 1</span>
+        <button class="page-btn" id="nextPage" onclick="changePage(1)">›</button>
+      </div>
+      <div class="sidebar-tools">
+        <button class="icon-btn" onclick="openWhitelistModal()" title="Manage Whitelist (Admin)" id="whitelistBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4M21 12c0 5-3.5 8-9 9-5.5-1-9-4-9-9V5l9-3 9 3z"/>
+          </svg>
+        </button>
+        <button class="icon-btn" onclick="enableNotifications()" title="Enable Push Notifications" id="notifBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ====== MAIN ====== -->
+  <main class="main" id="main">
+    <!-- Empty state -->
+    <div class="empty" id="emptyState">
+      <div class="empty-icon">
+        <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <h2>Select a case to view chat</h2>
+      <p>Pick any case from the sidebar to view the conversation, or create a new one.</p>
+    </div>
+
+    <!-- Chat view -->
+    <div id="chatView" style="display:none; flex:1; flex-direction:column; min-height:0;">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="avatar" id="chatHeaderAvatar"></div>
+          <div class="chat-header-text">
+            <div class="chat-header-id" id="chatHeaderId"></div>
+            <div class="chat-header-meta" id="chatHeaderMeta"></div>
+          </div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="icon-btn" onclick="toggleInfoPanel()" title="Group info">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div id="filePreviewWrap"></div>
+
+      <input type="file" id="fileInput" accept=".pdf,image/*,video/*" multiple style="display:none;" onchange="handleFileSelect(event)">
+
+      <div class="composer">
+        <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="Attach file (PDF, image, video — max 25MB)">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.49"/>
+          </svg>
+        </button>
+        <textarea class="composer-input" id="composerInput" placeholder="Type a message..." rows="1" oninput="autoResize(this); toggleSendBtn();"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ====== INFO PANEL ====== -->
+  <aside class="info-panel" id="infoPanel">
+    <div class="info-header">
+      <h3>Case Info</h3>
+      <button class="icon-btn" onclick="toggleInfoPanel()">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="info-body" id="infoBody"></div>
+  </aside>
+
+</div>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-overlay" id="newCaseModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Create New Case</h2>
+      <button class="icon-btn" onclick="closeModal('newCaseModal')">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Case ID *</label>
+        <input type="text" class="input-field" id="newCaseId" placeholder="e.g. 5678656">
+      </div>
+      <div class="form-group">
+        <label>Title <span class="optional">(optional)</span></label>
+        <input type="text" class="input-field" id="newCaseTitle" placeholder="e.g. Crown — Upper Molar">
+      </div>
+      <div class="form-group">
+        <label>Patient Name <span class="optional">(optional)</span></label>
+        <input type="text" class="input-field" id="newCasePatient" placeholder="e.g. John Doe">
+      </div>
+      <div class="form-group">
+        <label>Doctor Name <span class="optional">(optional)</span></label>
+        <input type="text" class="input-field" id="newCaseDoctor" placeholder="e.g. Dr. Patel">
+      </div>
+      <div class="form-group">
+        <label>Add Members <span class="optional">(by email)</span></label>
+        <div class="email-tag-input" id="emailTagInput" onclick="document.getElementById('emailInputField').focus()">
+          <input type="email" id="emailInputField" placeholder="Type email and press Enter..." onkeydown="handleEmailInput(event)">
+        </div>
+        <p style="font-size:11px; color:var(--text-mute); margin-top:6px;">External emails will be auto-whitelisted and invited.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('newCaseModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createCase()">Create Case</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WHITELIST MODAL ============ -->
+<div class="modal-overlay" id="whitelistModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Manage Whitelist</h2>
+      <button class="icon-btn" onclick="closeModal('whitelistModal')">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px; color:var(--text-soft); margin-bottom:16px;">
+        Whitelisted external (non-@dentallab.com) emails can sign in via OTP. Adding an email here triggers a register/login email to that address.
+      </p>
+      <div class="form-group">
+        <label>Add Email to Whitelist</label>
+        <div style="display:flex; gap:8px;">
+          <input type="email" class="input-field" id="whitelistAddInput" placeholder="external@partner.com" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault(); addToWhitelist();}">
+          <button class="btn btn-primary" style="width:auto; padding:10px 16px; margin:0;" onclick="addToWhitelist()">Add</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Whitelisted Emails (<span id="whitelistCount">0</span>)</label>
+        <div id="whitelistList" style="margin-top:8px;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('whitelistModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EDIT CASE MODAL ============ -->
+<div class="modal-overlay" id="editCaseModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Edit Case Details</h2>
+      <button class="icon-btn" onclick="closeModal('editCaseModal')">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Case ID</label>
+        <input type="text" class="input-field" id="editCaseId" disabled style="opacity:.6; cursor:not-allowed;">
+        <p style="font-size:11px; color:var(--text-mute); margin-top:6px;">Case ID cannot be changed after creation.</p>
+      </div>
+      <div class="form-group">
+        <label>Title <span class="optional">(optional)</span></label>
+        <input type="text" class="input-field" id="editCaseTitle" placeholder="e.g. Crown — Upper Molar">
+      </div>
+      <div class="form-group">
+        <label>Patient Name <span class="optional">(optional)</span></label>
+        <input type="text" class="input-field" id="editCasePatient" placeholder="e.g. John Doe">
+      </div>
+      <div class="form-group">
+        <label>Doctor Name <span class="optional">(optional)</span></label>
+        <input type="text" class="input-field" id="editCaseDoctor" placeholder="e.g. Dr. Patel">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('editCaseModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INVITE MEMBERS MODAL ============ -->
+<div class="modal-overlay" id="inviteMembersModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Invite Members</h2>
+      <button class="icon-btn" onclick="closeModal('inviteMembersModal')">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px; color:var(--text-soft); margin-bottom:16px;">
+        Add people to <b id="inviteCaseLabel"></b>. Existing users are notified instantly. New @dentallab.com users get a register-and-join link. External emails are auto-whitelisted and invited.
+      </p>
+      <div class="form-group">
+        <label>Add Members <span class="optional">(by email)</span></label>
+        <div class="email-tag-input" id="inviteEmailTagInput" onclick="document.getElementById('inviteEmailInputField').focus()">
+          <input type="email" id="inviteEmailInputField" placeholder="Type email and press Enter..." onkeydown="handleInviteEmailInput(event)">
+        </div>
+      </div>
+      <div id="invitePreview" style="margin-top:8px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('inviteMembersModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitInvite()">Send Invites</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============ DEMO BANNER ============ -->
+<div class="demo-banner">
+  <div class="pulse"></div>
+  Demo Mode · Mock Data
+</div>
+
+<script>
+// ===================================================================
+// STATE
+// ===================================================================
+const STATE = {
+  currentUser: {
+    name: 'Faisal Ahmed',
+    email: 'faisal.ahmed@dentallab.com',
+    role: 'Lab Manager',
+    department: 'Production',
+    isAdmin: true,
+    avatar: 'FA',
+    color: '#DF2926'
+  },
+  cases: [],
+  activeChat: null,
+  pendingEmails: [],
+  theme: 'light',
+  view: 'joined',           // 'joined' | 'discover'
+  currentPage: 1,
+  casesPerPage: 10,
+  whitelist: [
+    { email: 'r.patel@brightsmile.com', addedBy: 'Faisal Ahmed', addedAt: 'Apr 28' },
+    { email: 'h.brennan@familycare.com', addedBy: 'Faisal Ahmed', addedAt: 'Apr 22' }
+  ],
+  notificationsEnabled: false
+};
+
+// Mock cases
+const MOCK_CASES = [
+  {
+    id: '5678656',
+    title: 'Crown — Upper Molar',
+    patient: 'John Doe',
+    doctor: 'Dr. Patel',
+    createdAt: 'Apr 28',
+    members: [
+      { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false },
+      { name: 'Rifat', email: 'rifat@dentallab.com', role: 'Technician', avatar: 'RI', isAdmin: false, isExternal: false },
+      { name: 'Dr. Patel', email: 'r.patel@brightsmile.com', role: 'Dentist (External)', avatar: 'RP', isAdmin: false, isExternal: true }
+    ],
+    messages: [
+      { type: 'system', text: 'Faisal Ahmed created this case' },
+      { type: 'msg', sender: 'Rifat', avatar: 'RI', text: 'Got the impression scan today. Looks clean, no remakes needed.', time: '09:14', own: false },
+      { type: 'msg', sender: 'Rifat', avatar: 'RI', text: 'Starting on the model now.', time: '09:15', own: false },
+      { type: 'msg', sender: 'Faisal Ahmed', avatar: 'FA', text: 'Good. Dr. Patel is hoping for delivery by Friday — can we make that?', time: '09:18', own: true },
+      { type: 'msg', sender: 'Rifat', avatar: 'RI', text: 'Yes, should be no problem. Will have it ready Thursday EOD for QC.', time: '09:21', own: false },
+      { type: 'msg', sender: 'Dr. Patel', avatar: 'RP', text: 'Thanks team. Patient is flying out Saturday so this timing is critical.', time: '11:42', own: false },
+      { type: 'system', text: 'Dr. Patel shared a file' },
+      { type: 'msg', sender: 'Dr. Patel', avatar: 'RP', text: 'Here are the bite registration photos from the appointment.', time: '11:43', own: false, file: { name: 'bite_registration.pdf', size: '2.4 MB', icon: 'pdf' } },
+      { type: 'msg', sender: 'Faisal Ahmed', avatar: 'FA', text: 'Got it — forwarding to Rifat.', time: '11:50', own: true }
+    ]
+  },
+  {
+    id: '5678412',
+    title: 'Bridge — Anterior',
+    patient: 'Jane Smith',
+    doctor: 'Dr. Hassan',
+    createdAt: 'Apr 27',
+    members: [
+      { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false },
+      { name: 'Aisha Khan', email: 'aisha.khan@dentallab.com', role: 'Technician', avatar: 'AK', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Faisal Ahmed created this case' },
+      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Shade match looks tricky on this one. Patient has very translucent enamel.', time: 'Yesterday', own: false },
+      { type: 'msg', sender: 'Faisal Ahmed', avatar: 'FA', text: 'Let\'s do A1 with B1 incisal layering. Check the photos again.', time: 'Yesterday', own: true }
+    ]
+  },
+  {
+    id: '5678123',
+    title: 'Implant Abutment',
+    patient: 'Robert Lee',
+    doctor: 'Dr. Hassan',
+    createdAt: 'Apr 25',
+    members: [
+      { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false },
+      { name: 'Rifat', email: 'rifat@dentallab.com', role: 'Technician', avatar: 'RI', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Faisal Ahmed created this case' },
+      { type: 'msg', sender: 'Rifat', avatar: 'RI', text: 'Abutment milled. Sending photos.', time: 'Apr 25', own: false, file: { name: 'abutment_photo.jpg', size: '4.1 MB', icon: 'image' } },
+      { type: 'msg', sender: 'Faisal Ahmed', avatar: 'FA', text: 'Looks good. Approved for shipping.', time: 'Apr 25', own: true }
+    ]
+  },
+  {
+    id: '5677998',
+    title: 'Denture Repair',
+    patient: 'Maria Garcia',
+    doctor: 'Dr. Brennan',
+    createdAt: 'Apr 22',
+    members: [
+      { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false }
+    ],
+    joinRequests: [
+      { name: 'Tom Wright', email: 'tom.wright@dentallab.com', avatar: 'TW', requestedAt: '2h ago' }
+    ],
+    messages: [
+      { type: 'system', text: 'Faisal Ahmed created this case' },
+      { type: 'msg', sender: 'Faisal Ahmed', avatar: 'FA', text: 'Repair complete. Ready for pickup.', time: 'Apr 22', own: true }
+    ]
+  },
+  {
+    id: '5677845',
+    title: 'Veneer Set — Anterior 6',
+    patient: 'Emily Brooks',
+    doctor: 'Dr. Patel',
+    createdAt: 'Apr 20',
+    members: [
+      { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false },
+      { name: 'Aisha Khan', email: 'aisha.khan@dentallab.com', role: 'Technician', avatar: 'AK', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Faisal Ahmed created this case' },
+      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Wax-up done. Sending photos for approval.', time: 'Apr 20', own: false }
+    ]
+  },
+  {
+    id: '5677654',
+    title: 'Night Guard',
+    patient: 'David Wong',
+    doctor: 'Dr. Hassan',
+    createdAt: 'Apr 18',
+    members: [
+      { name: 'Rifat', email: 'rifat@dentallab.com', role: 'Technician', avatar: 'RI', isAdmin: false, isExternal: false },
+      { name: 'Dr. Hassan', email: 's.hassan@brightsmile.com', role: 'Dentist (External)', avatar: 'SH', isAdmin: false, isExternal: true }
+    ],
+    messages: [
+      { type: 'system', text: 'Rifat created this case' },
+      { type: 'msg', sender: 'Rifat', avatar: 'RI', text: 'Impression looks good. Starting fabrication.', time: 'Apr 18', own: false }
+    ]
+  },
+  {
+    id: '5677432',
+    title: 'Inlay — Lower Right',
+    patient: 'Anna Park',
+    doctor: 'Dr. Brennan',
+    createdAt: 'Apr 17',
+    members: [
+      { name: 'Aisha Khan', email: 'aisha.khan@dentallab.com', role: 'Technician', avatar: 'AK', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Aisha Khan created this case' }
+    ]
+  },
+  {
+    id: '5677321',
+    title: 'Full Arch Implant',
+    patient: 'Robert Lee',
+    doctor: 'Dr. Patel',
+    createdAt: 'Apr 15',
+    members: [
+      { name: 'Rifat', email: 'rifat@dentallab.com', role: 'Technician', avatar: 'RI', isAdmin: false, isExternal: false },
+      { name: 'Tom Wright', email: 'tom.wright@dentallab.com', role: 'Technician', avatar: 'TW', isAdmin: false, isExternal: false }
+    ],
+    joinRequests: [
+      { name: 'Aisha Khan', email: 'aisha.khan@dentallab.com', avatar: 'AK', requestedAt: '1d ago' }
+    ],
+    messages: [
+      { type: 'system', text: 'Rifat created this case' },
+      { type: 'msg', sender: 'Tom Wright', avatar: 'TW', text: 'Working on the framework today.', time: 'Apr 15', own: false }
+    ]
+  },
+  {
+    id: '5677210',
+    title: 'Crown — Lower Bicuspid',
+    patient: 'Linda Cho',
+    doctor: 'Dr. Hassan',
+    createdAt: 'Apr 14',
+    members: [
+      { name: 'Aisha Khan', email: 'aisha.khan@dentallab.com', role: 'Technician', avatar: 'AK', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Aisha Khan created this case' }
+    ]
+  },
+  {
+    id: '5677088',
+    title: 'Partial Denture',
+    patient: 'Henry Adams',
+    doctor: 'Dr. Brennan',
+    createdAt: 'Apr 12',
+    members: [
+      { name: 'Tom Wright', email: 'tom.wright@dentallab.com', role: 'Technician', avatar: 'TW', isAdmin: false, isExternal: false },
+      { name: 'Rifat', email: 'rifat@dentallab.com', role: 'Technician', avatar: 'RI', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Tom Wright created this case' }
+    ]
+  },
+  {
+    id: '5676912',
+    title: 'Bridge — Posterior 3-unit',
+    patient: 'Grace Liu',
+    doctor: 'Dr. Patel',
+    createdAt: 'Apr 10',
+    members: [
+      { name: 'Aisha Khan', email: 'aisha.khan@dentallab.com', role: 'Technician', avatar: 'AK', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Aisha Khan created this case' }
+    ]
+  },
+  {
+    id: '5676755',
+    title: 'Diagnostic Wax-up',
+    patient: 'Marcus Webb',
+    doctor: 'Dr. Hassan',
+    createdAt: 'Apr 8',
+    members: [
+      { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false },
+      { name: 'Tom Wright', email: 'tom.wright@dentallab.com', role: 'Technician', avatar: 'TW', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Faisal Ahmed created this case' },
+      { type: 'msg', sender: 'Tom Wright', avatar: 'TW', text: 'Wax-up sent for approval.', time: 'Apr 8', own: false }
+    ]
+  },
+  {
+    id: '5676623',
+    title: 'Implant Crown',
+    patient: 'Olivia Reed',
+    doctor: 'Dr. Patel',
+    createdAt: 'Apr 5',
+    members: [
+      { name: 'Rifat', email: 'rifat@dentallab.com', role: 'Technician', avatar: 'RI', isAdmin: false, isExternal: false }
+    ],
+    messages: [
+      { type: 'system', text: 'Rifat created this case' }
+    ]
+  }
+];
+
+STATE.cases = MOCK_CASES;
+
+// ===================================================================
+// LOGIN FLOW
+// ===================================================================
+const DEMO_USERS = {
+  'faisal.ahmed@dentallab.com': {
+    name: 'Faisal Ahmed',
+    email: 'faisal.ahmed@dentallab.com',
+    role: 'Lab Manager',
+    department: 'Production',
+    isAdmin: true,
+    avatar: 'FA'
+  },
+  'rifat@dentallab.com': {
+    name: 'Rifat',
+    email: 'rifat@dentallab.com',
+    role: 'Technician',
+    department: 'Production',
+    isAdmin: false,
+    avatar: 'RI'
+  }
+};
+
+let PENDING_LOGIN_EMAIL = null;
+
+function loginAs(email) {
+  document.getElementById('emailInput').value = email;
+  sendOtp();
+}
+
+function sendOtp() {
+  const email = document.getElementById('emailInput').value.trim().toLowerCase();
+  if (!email) {
+    showToast('Please enter your email', 'error');
+    return;
+  }
+  const isInternal = email.endsWith('@dentallab.com');
+  const isWhitelisted = STATE.whitelist.some(w => w.email === email);
+  if (!isInternal && !isWhitelisted) {
+    showToast('Email not whitelisted', 'Only @dentallab.com or whitelisted external emails can sign in. Contact your admin.', 'error');
+    return;
+  }
+
+  PENDING_LOGIN_EMAIL = email;
+
+  document.getElementById('emailEcho').textContent = email;
+  document.getElementById('loginStep1').style.display = 'none';
+  document.getElementById('loginStep2').style.display = 'block';
+
+  setTimeout(() => {
+    document.querySelector('.otp-input[data-otp="0"]').focus();
+  }, 100);
+
+  showToast('OTP sent', 'Use code 123456 for the demo.', 'success');
+}
+
+function resendOtp() {
+  showToast('OTP resent', 'Use code 123456 for the demo.', 'success');
+}
+
+function verifyOtp() {
+  const otp = Array.from(document.querySelectorAll('.otp-input')).map(i => i.value).join('');
+  if (otp !== '123456') {
+    showToast('Invalid code', 'Try 123456 for the demo.', 'error');
+    return;
+  }
+  finalizeLogin();
+}
+
+function finalizeLogin(opts) {
+  const animate = !opts || opts.animate !== false;
+  // Set current user from email
+  const email = PENDING_LOGIN_EMAIL || 'faisal.ahmed@dentallab.com';
+  const profile = DEMO_USERS[email];
+  if (profile) {
+    STATE.currentUser = { ...profile };
+  } else {
+    // External whitelisted user — synth profile
+    const initials = email.split('@')[0].split(/[._-]/).map(p => p[0]?.toUpperCase()).slice(0, 2).join('') || '??';
+    STATE.currentUser = {
+      name: email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      email,
+      role: 'External',
+      department: '—',
+      isAdmin: false,
+      avatar: initials
+    };
+  }
+
+  // Update sidebar user chip
+  document.getElementById('userName').textContent = STATE.currentUser.name;
+  document.getElementById('userRole').textContent = STATE.currentUser.role;
+  document.getElementById('userAvatar').textContent = STATE.currentUser.avatar;
+  document.getElementById('userBadge').style.display = STATE.currentUser.isAdmin ? 'inline-block' : 'none';
+
+  // Hide admin-only UI for non-admins
+  document.getElementById('newCaseBtn').style.display = STATE.currentUser.isAdmin ? 'flex' : 'none';
+  document.getElementById('whitelistBtn').style.display = STATE.currentUser.isAdmin ? 'flex' : 'none';
+  document.getElementById('discoverTab').style.display = STATE.currentUser.isAdmin ? '' : 'none';
+  if (!STATE.currentUser.isAdmin) STATE.view = 'joined';
+
+  // Persist session
+  try { localStorage.setItem('dchat:user', email); } catch (e) {}
+
+  const showApp = () => {
+    document.getElementById('app').style.display = 'grid';
+    STATE.view = 'joined';
+    STATE.currentPage = 1;
+    document.querySelectorAll('.view-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.view === 'joined');
+    });
+    STATE.activeChat = null;
+    document.getElementById('chatView').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'flex';
+    document.getElementById('app').classList.remove('with-info', 'chat-open');
+    renderChats();
+  };
+
+  if (animate) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    setTimeout(showApp, 400);
+  } else {
+    document.getElementById('loginScreen').style.display = 'none';
+    showApp();
+  }
+
+  PENDING_LOGIN_EMAIL = null;
+}
+
+// OTP auto-advance + paste
+document.querySelectorAll('.otp-input').forEach((input, i, arr) => {
+  input.addEventListener('input', e => {
+    if (e.target.value.length === 1 && i < arr.length - 1) {
+      arr[i + 1].focus();
+    }
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !e.target.value && i > 0) {
+      arr[i - 1].focus();
+    }
+  });
+  input.addEventListener('paste', e => {
+    e.preventDefault();
+    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+    paste.split('').forEach((char, idx) => {
+      if (arr[idx]) arr[idx].value = char;
+    });
+    if (arr[Math.min(paste.length, arr.length - 1)]) {
+      arr[Math.min(paste.length, arr.length - 1)].focus();
+    }
+  });
+});
+
+function logout() {
+  try { localStorage.removeItem('dchat:user'); } catch (e) {}
+  STATE.notificationsEnabled = false;
+  document.getElementById('notifBtn').classList.remove('active');
+  document.getElementById('app').style.display = 'none';
+  const login = document.getElementById('loginScreen');
+  login.style.display = '';
+  login.classList.remove('hidden');
+  document.getElementById('loginStep1').style.display = 'block';
+  document.getElementById('loginStep2').style.display = 'none';
+  document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+}
+
+// ===================================================================
+// CHAT LIST
+// ===================================================================
+function isMember(c) {
+  return c.members.some(m => m.email === STATE.currentUser.email);
+}
+
+function hasPendingRequest(c) {
+  return c.joinRequests?.some(r => r.email === STATE.currentUser.email);
+}
+
+function renderChats() {
+  const search = document.getElementById('searchInput').value.trim();
+  const list = document.getElementById('chatList');
+  const isAdmin = STATE.currentUser.isAdmin;
+  const view = isAdmin ? STATE.view : 'joined';
+
+  const joinedCases = STATE.cases.filter(c => isMember(c));
+  const discoverCases = STATE.cases.filter(c => !isMember(c));
+
+  document.getElementById('joinedCount').textContent = joinedCases.length;
+  document.getElementById('discoverCount').textContent = discoverCases.length;
+
+  let pool = view === 'joined' ? joinedCases : discoverCases;
+  if (search) {
+    if (isAdmin) {
+      pool = pool.filter(c => c.id.includes(search) || (c.title || '').toLowerCase().includes(search.toLowerCase()));
+    } else {
+      pool = pool.filter(c => c.id === search);
+    }
+  }
+
+  const total = pool.length;
+  const totalPages = Math.max(1, Math.ceil(total / STATE.casesPerPage));
+  if (STATE.currentPage > totalPages) STATE.currentPage = totalPages;
+  const start = (STATE.currentPage - 1) * STATE.casesPerPage;
+  const paginated = pool.slice(start, start + STATE.casesPerPage);
+
+  if (total === 0) {
+    list.innerHTML = `
+      <div style="padding:32px 16px; text-align:center; color:var(--text-mute); font-size:13px;">
+        ${search
+          ? `No cases found for "${search}".`
+          : view === 'joined'
+            ? (isAdmin
+                ? `You haven't joined any cases yet.<br><br>Switch to <b>Discover</b> to find cases.`
+                : `You haven't joined any cases yet.`)
+            : 'No more cases to discover.'}
+        ${STATE.currentUser.isAdmin && view === 'joined'
+          ? '<br><br><button onclick="openNewCaseModal()" style="color:var(--red); font-weight:600;">+ Create new case</button>'
+          : ''}
+      </div>
+    `;
+  } else {
+    list.innerHTML = paginated.map(c => {
+      if (view === 'discover') return renderDiscoverItem(c);
+      return renderJoinedItem(c);
+    }).join('');
+  }
+
+  // Pagination footer
+  document.getElementById('pageInfo').textContent = `${total === 0 ? 0 : start + 1}–${Math.min(start + STATE.casesPerPage, total)} of ${total}`;
+  document.getElementById('prevPage').disabled = STATE.currentPage <= 1;
+  document.getElementById('nextPage').disabled = STATE.currentPage >= totalPages;
+
+  // Whitelist button visibility (admin only)
+  document.getElementById('whitelistBtn').style.display = STATE.currentUser.isAdmin ? 'flex' : 'none';
+}
+
+function renderJoinedItem(c) {
+  const lastMsg = [...c.messages].reverse().find(m => m.type === 'msg');
+  const lastFiles = lastMsg ? (lastMsg.files || (lastMsg.file ? [lastMsg.file] : [])) : [];
+  const preview = lastMsg
+    ? (lastFiles.length
+        ? '📎 ' + (lastFiles.length > 1 ? `${lastFiles.length} files` : lastFiles[0].name)
+        : lastMsg.text)
+    : 'No messages yet';
+  const time = lastMsg ? lastMsg.time : c.createdAt;
+  const active = STATE.activeChat?.id === c.id ? 'active' : '';
+  return `
+    <div class="chat-item ${active}" onclick="openChat('${c.id}')">
+      <div class="avatar" style="background:${getColorForId(c.id)}">${c.id.slice(-2)}</div>
+      <div class="chat-item-content">
+        <div class="chat-item-top">
+          <span class="chat-item-id">#${c.id}</span>
+          <span class="chat-item-time">${time}</span>
+        </div>
+        <div class="chat-item-title">${c.title || '—'}</div>
+        <div class="chat-item-preview">${preview}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDiscoverItem(c) {
+  const requested = hasPendingRequest(c);
+  const isAdmin = STATE.currentUser.isAdmin;
+  return `
+    <div class="chat-item" ${isAdmin ? `onclick="directJoin('${c.id}')" style="cursor:pointer;"` : ''}>
+      <div class="avatar" style="background:${getColorForId(c.id)}">${c.id.slice(-2)}</div>
+      <div class="chat-item-content">
+        <div class="chat-item-top">
+          <span class="chat-item-id">#${c.id}</span>
+          <span class="chat-item-time">${c.members.length} member${c.members.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="chat-item-title">${c.title || '—'}</div>
+        <div class="chat-item-preview">${c.doctor || 'No doctor assigned'}${c.patient ? ' · ' + c.patient : ''}</div>
+      </div>
+      ${isAdmin
+        ? `<button class="discover-action" onclick="event.stopPropagation(); directJoin('${c.id}')">Join</button>`
+        : `<button class="discover-action ${requested ? 'requested' : ''}"
+                onclick="event.stopPropagation(); requestJoin('${c.id}')"
+                ${requested ? 'disabled' : ''}>
+          ${requested ? 'Requested' : 'Request to Join'}
+        </button>`}
+    </div>
+  `;
+}
+
+function directJoin(id) {
+  const c = STATE.cases.find(c => c.id === id);
+  if (!c) return;
+  const u = STATE.currentUser;
+  if (c.members.some(m => m.email === u.email)) {
+    openChat(id);
+    return;
+  }
+  c.members.push({
+    name: u.name,
+    email: u.email,
+    role: u.role,
+    avatar: u.avatar,
+    isAdmin: u.isAdmin,
+    isExternal: false
+  });
+  c.joinRequests = (c.joinRequests || []).filter(r => r.email !== u.email);
+  c.messages.push({ type: 'system', text: u.name + ' joined the case' });
+  showToast('Joined', `You joined #${c.id}.`, 'success');
+  openChat(id);
+}
+
+function switchView(v) {
+  STATE.view = v;
+  STATE.currentPage = 1;
+  document.querySelectorAll('.view-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.view === v);
+  });
+  renderChats();
+}
+
+function changePage(delta) {
+  STATE.currentPage += delta;
+  renderChats();
+}
+
+function requestJoin(id) {
+  const c = STATE.cases.find(c => c.id === id);
+  if (!c) return;
+  if (!c.joinRequests) c.joinRequests = [];
+  if (c.joinRequests.some(r => r.email === STATE.currentUser.email)) {
+    showToast('Already requested', 'Your request is pending admin approval.', 'error');
+    return;
+  }
+  c.joinRequests.push({
+    email: STATE.currentUser.email,
+    name: STATE.currentUser.name,
+    avatar: STATE.currentUser.avatar,
+    requestedAt: 'Just now'
+  });
+  showToast('Request sent', `Admin will review your request to join #${id}.`, 'success');
+  renderChats();
+}
+
+function approveRequest(caseId, email) {
+  const c = STATE.cases.find(c => c.id === caseId);
+  if (!c) return;
+  const req = c.joinRequests?.find(r => r.email === email);
+  if (!req) return;
+  c.members.push({
+    name: req.name,
+    email: req.email,
+    role: email.endsWith('@dentallab.com') ? 'Member' : 'External',
+    avatar: req.avatar,
+    isAdmin: false,
+    isExternal: !email.endsWith('@dentallab.com')
+  });
+  c.joinRequests = c.joinRequests.filter(r => r.email !== email);
+  c.messages.push({ type: 'system', text: STATE.currentUser.name + ' approved ' + req.name + ' to join' });
+  showToast('Approved', `${req.name} added to #${c.id}.`, 'success');
+  renderInfoPanel();
+  renderMessages();
+  renderChats();
+  document.getElementById('chatHeaderMeta').textContent = `${c.members.length} members · ${c.doctor || 'No doctor assigned'}`;
+}
+
+function rejectRequest(caseId, email) {
+  const c = STATE.cases.find(c => c.id === caseId);
+  if (!c) return;
+  c.joinRequests = (c.joinRequests || []).filter(r => r.email !== email);
+  showToast('Rejected', 'Join request rejected.', 'success');
+  renderInfoPanel();
+  renderChats();
+}
+
+function getColorForId(id) {
+  const colors = ['#DF2926', '#1C1C1C', '#444444', '#A2171B', '#666666'];
+  return colors[parseInt(id.slice(-1)) % colors.length];
+}
+
+// ===================================================================
+// CHAT VIEW
+// ===================================================================
+function openChat(id) {
+  const c = STATE.cases.find(c => c.id === id);
+  if (!c) return;
+  if (STATE.activeChat?.id !== id) {
+    PENDING_FILES = [];
+    renderFilePreview();
+    toggleSendBtn();
+  }
+  STATE.activeChat = c;
+
+  document.getElementById('emptyState').style.display = 'none';
+  const view = document.getElementById('chatView');
+  view.style.display = 'flex';
+
+  document.getElementById('chatHeaderAvatar').textContent = id.slice(-2);
+  document.getElementById('chatHeaderAvatar').style.background = getColorForId(id);
+  document.getElementById('chatHeaderId').textContent = '#' + id + (c.title ? ' · ' + c.title : '');
+  document.getElementById('chatHeaderMeta').textContent = `${c.members.length} members · ${c.doctor || 'No doctor assigned'}`;
+
+  renderMessages();
+  renderInfoPanel();
+  renderChats();
+
+  document.getElementById('app').classList.add('chat-open');
+}
+
+function renderMessages() {
+  const wrap = document.getElementById('messages');
+  const msgs = STATE.activeChat.messages;
+  wrap.innerHTML = `
+    <div class="day-divider"><span>Today</span></div>
+    ${msgs.map(m => renderMsg(m)).join('')}
+  `;
+  setTimeout(() => { wrap.scrollTop = wrap.scrollHeight; }, 50);
+}
+
+function renderMsg(m) {
+  if (m.type === 'system') {
+    return `<div class="system-msg">${m.text}</div>`;
+  }
+  const files = m.files || (m.file ? [m.file] : []);
+  const filesHtml = files.map(f => `
+    <div class="msg-file">
+      <div class="msg-file-icon">${fileIcon(f.icon)}</div>
+      <div class="msg-file-info">
+        <div class="msg-file-name">${f.name}</div>
+        <div class="msg-file-size">${f.size}</div>
+      </div>
+    </div>
+  `).join('');
+  return `
+    <div class="msg ${m.own ? 'own' : ''}">
+      <div class="avatar sm" style="background:${m.own ? '#DF2926' : '#444444'}">${m.avatar}</div>
+      <div class="msg-bubble-wrap">
+        <div class="msg-meta">
+          <b>${m.own ? 'You' : m.sender}</b>
+          <span>${m.time}</span>
+        </div>
+        <div class="msg-bubble">
+          ${m.text || ''}
+          ${filesHtml}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function fileIcon(type) {
+  if (type === 'pdf') return '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>';
+  if (type === 'image') return '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+  return '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg>';
+}
+
+// ===================================================================
+// COMPOSER
+// ===================================================================
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function toggleSendBtn() {
+  const v = document.getElementById('composerInput').value.trim();
+  document.getElementById('sendBtn').disabled = !v && PENDING_FILES.length === 0;
+}
+
+let PENDING_FILES = [];
+
+function fmtFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function fileTypeFromName(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (ext === 'pdf') return 'pdf';
+  if (['jpg','jpeg','png','gif','webp','heic','svg'].includes(ext)) return 'image';
+  if (['mp4','mov','webm','m4v','avi'].includes(ext)) return 'video';
+  return 'file';
+}
+
+function handleFileSelect(e) {
+  const files = Array.from(e.target.files || []);
+  const MAX = 25 * 1024 * 1024;
+  const allowed = /\.(pdf|jpg|jpeg|png|gif|webp|heic|svg|mp4|mov|webm|m4v)$/i;
+  for (const f of files) {
+    if (f.size > MAX) {
+      showToast('File too large', `${f.name} is ${fmtFileSize(f.size)}. Max allowed is 25MB.`, 'error');
+      continue;
+    }
+    if (!allowed.test(f.name)) {
+      showToast('Type not allowed', `${f.name} — only PDF, images, and videos are accepted.`, 'error');
+      continue;
+    }
+    PENDING_FILES.push({ name: f.name, size: fmtFileSize(f.size), icon: fileTypeFromName(f.name) });
+  }
+  renderFilePreview();
+  toggleSendBtn();
+  e.target.value = '';
+}
+
+function renderFilePreview() {
+  const wrap = document.getElementById('filePreviewWrap');
+  if (PENDING_FILES.length === 0) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = PENDING_FILES.map((f, i) => `
+    <div class="file-preview">
+      <div class="file-preview-icon">${fileIcon(f.icon)}</div>
+      <div class="file-preview-info">
+        <div class="file-preview-name">${f.name}</div>
+        <div class="file-preview-size">${f.size} · ready to send</div>
+      </div>
+      <button class="file-preview-remove" onclick="cancelFile(${i})" title="Remove">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function cancelFile(index) {
+  if (typeof index === 'number') {
+    PENDING_FILES.splice(index, 1);
+  } else {
+    PENDING_FILES = [];
+  }
+  renderFilePreview();
+  toggleSendBtn();
+}
+
+function sendMessage() {
+  const input = document.getElementById('composerInput');
+  const text = input.value.trim();
+  if ((!text && PENDING_FILES.length === 0) || !STATE.activeChat) return;
+
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+  STATE.activeChat.messages.push({
+    type: 'msg',
+    sender: STATE.currentUser.name,
+    avatar: STATE.currentUser.avatar,
+    text,
+    time,
+    own: true,
+    files: PENDING_FILES.length ? PENDING_FILES.slice() : undefined
+  });
+
+  PENDING_FILES = [];
+  renderFilePreview();
+  input.value = '';
+  autoResize(input);
+  toggleSendBtn();
+  renderMessages();
+  renderChats();
+
+  // Mock auto-reply 1.5s later (just for demo feel)
+  if (Math.random() > 0.4) {
+    setTimeout(mockReply, 1500 + Math.random() * 1500);
+  }
+}
+
+function mockReply() {
+  if (!STATE.activeChat) return;
+  const others = STATE.activeChat.members.filter(m => m.email !== STATE.currentUser.email);
+  if (others.length === 0) return;
+  const replier = others[Math.floor(Math.random() * others.length)];
+  const replies = ['Got it 👍', 'Sounds good.', 'Thanks!', 'On it.', 'Will check and confirm.', 'Understood.', 'Perfect, thanks for the update.'];
+  const text = replies[Math.floor(Math.random() * replies.length)];
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+  STATE.activeChat.messages.push({
+    type: 'msg',
+    sender: replier.name,
+    avatar: replier.avatar,
+    text,
+    time,
+    own: false
+  });
+  renderMessages();
+  renderChats();
+}
+
+document.getElementById('composerInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ===================================================================
+// INFO PANEL
+// ===================================================================
+function toggleInfoPanel() {
+  document.getElementById('app').classList.toggle('with-info');
+}
+
+function renderInfoPanel() {
+  const c = STATE.activeChat;
+  if (!c) return;
+  const body = document.getElementById('infoBody');
+  body.innerHTML = `
+    <div class="info-hero">
+      <div class="avatar lg" style="background:${getColorForId(c.id)}">${c.id.slice(-2)}</div>
+      <h4>#${c.id}</h4>
+      <p>${c.title || 'No title'}</p>
+    </div>
+
+    <div class="info-section">
+      <h5>Case Details</h5>
+      <div class="info-row"><span>Case ID</span><span>#${c.id}</span></div>
+      <div class="info-row"><span>Title</span><span>${c.title || '—'}</span></div>
+      <div class="info-row"><span>Patient</span><span>${c.patient || '—'}</span></div>
+      <div class="info-row"><span>Doctor</span><span>${c.doctor || '—'}</span></div>
+      <div class="info-row"><span>Created</span><span>${c.createdAt}</span></div>
+    </div>
+
+    <div class="info-section">
+      <h5>Members (${c.members.length})</h5>
+      ${c.members.map(m => `
+        <div class="member">
+          <div class="avatar sm" style="background:${m.isAdmin ? '#DF2926' : '#444444'}">${m.avatar}</div>
+          <div class="member-info">
+            <div class="member-name">
+              ${m.name}
+              ${m.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
+              ${m.isExternal ? '<span class="admin-badge" style="background:#666;">Ext</span>' : ''}
+            </div>
+            <div class="member-role">${m.role}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    ${STATE.currentUser.isAdmin && c.joinRequests?.length ? `
+      <div class="info-section">
+        <h5>Pending Join Requests (${c.joinRequests.length})</h5>
+        ${c.joinRequests.map(r => `
+          <div class="request-row">
+            <div class="avatar sm" style="background:#444;">${r.avatar}</div>
+            <div class="req-info">
+              <div class="req-name">${r.name}</div>
+              <div class="req-email">${r.email} · ${r.requestedAt}</div>
+            </div>
+            <div class="req-actions">
+              <button class="req-btn approve" onclick="approveRequest('${c.id}', '${r.email}')">Approve</button>
+              <button class="req-btn reject" onclick="rejectRequest('${c.id}', '${r.email}')">Reject</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+
+    ${STATE.currentUser.isAdmin ? `
+      <div class="info-section">
+        <h5>Admin Actions</h5>
+        <button class="btn btn-secondary" style="margin-top:0;" onclick="openInviteModal()">Invite Members</button>
+        <button class="btn btn-secondary" onclick="openEditModal()">Edit Case Details</button>
+        <div class="danger-zone">
+          <div class="danger-zone-label">Danger Zone</div>
+          <button class="danger-link" onclick="mockDelete()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+            </svg>
+            Delete this case
+          </button>
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+// ===================================================================
+// EDIT CASE
+// ===================================================================
+function openEditModal() {
+  if (!STATE.currentUser.isAdmin) {
+    showToast('Admins only', 'Only admins can edit case details.', 'error');
+    return;
+  }
+  const c = STATE.activeChat;
+  if (!c) return;
+  document.getElementById('editCaseId').value = '#' + c.id;
+  document.getElementById('editCaseTitle').value = c.title || '';
+  document.getElementById('editCasePatient').value = c.patient || '';
+  document.getElementById('editCaseDoctor').value = c.doctor || '';
+  document.getElementById('editCaseModal').classList.add('show');
+}
+
+function saveEdit() {
+  const c = STATE.activeChat;
+  if (!c) return;
+  const newTitle = document.getElementById('editCaseTitle').value.trim();
+  const newPatient = document.getElementById('editCasePatient').value.trim();
+  const newDoctor = document.getElementById('editCaseDoctor').value.trim();
+
+  const changed = newTitle !== (c.title || '') || newPatient !== (c.patient || '') || newDoctor !== (c.doctor || '');
+
+  c.title = newTitle;
+  c.patient = newPatient;
+  c.doctor = newDoctor;
+
+  if (changed) {
+    c.messages.push({ type: 'system', text: STATE.currentUser.name + ' updated the case details' });
+  }
+
+  closeModal('editCaseModal');
+  showToast('Case updated', 'Case details have been saved.', 'success');
+
+  document.getElementById('chatHeaderId').textContent = '#' + c.id + (c.title ? ' · ' + c.title : '');
+  document.getElementById('chatHeaderMeta').textContent = `${c.members.length} members · ${c.doctor || 'No doctor assigned'}`;
+
+  renderInfoPanel();
+  renderMessages();
+  renderChats();
+}
+
+// ===================================================================
+// INVITE MEMBERS (post-creation)
+// ===================================================================
+let INVITE_EMAILS = [];
+
+function openInviteModal() {
+  if (!STATE.currentUser.isAdmin) {
+    showToast('Admins only', 'Only admins can invite members.', 'error');
+    return;
+  }
+  const c = STATE.activeChat;
+  if (!c) return;
+  INVITE_EMAILS = [];
+  document.getElementById('inviteEmailInputField').value = '';
+  document.getElementById('inviteCaseLabel').textContent = '#' + c.id + (c.title ? ' · ' + c.title : '');
+  renderInviteEmailTags();
+  renderInvitePreview();
+  document.getElementById('inviteMembersModal').classList.add('show');
+  setTimeout(() => document.getElementById('inviteEmailInputField').focus(), 100);
+}
+
+function handleInviteEmailInput(e) {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    moveAutocomplete('invite', e.key === 'ArrowDown' ? 1 : -1);
+    return;
+  }
+  if (e.key === 'Escape') { hideAutocomplete('invite'); return; }
+  if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+    e.preventDefault();
+    const list = document.getElementById('acList_invite');
+    if (list && list.style.display !== 'none' && AC_ACTIVE_INDEX >= 0) {
+      const item = list.children[AC_ACTIVE_INDEX];
+      if (item) { pickAutocomplete('invite', item.dataset.email); return; }
+    }
+    const v = e.target.value.trim().replace(/,$/, '').toLowerCase();
+    if (!v) return;
+    if (!/\S+@\S+\.\S+/.test(v)) {
+      showToast('Invalid email', `"${v}" is not a valid email address.`, 'error');
+      return;
+    }
+    if (INVITE_EMAILS.includes(v)) {
+      showToast('Already added', `${v} is already in the invite list.`, 'error');
+      return;
+    }
+    if (STATE.activeChat?.members.some(m => m.email.toLowerCase() === v)) {
+      showToast('Already a member', `${v} is already part of this case.`, 'error');
+      return;
+    }
+    INVITE_EMAILS.push(v);
+    e.target.value = '';
+    renderInviteEmailTags();
+    renderInvitePreview();
+    hideAutocomplete('invite');
+  } else if (e.key === 'Backspace' && !e.target.value && INVITE_EMAILS.length) {
+    INVITE_EMAILS.pop();
+    renderInviteEmailTags();
+    renderInvitePreview();
+  } else {
+    setTimeout(() => showAutocomplete('invite', e.target.value), 0);
+  }
+}
+
+function removeInviteEmail(email) {
+  INVITE_EMAILS = INVITE_EMAILS.filter(e => e !== email);
+  renderInviteEmailTags();
+  renderInvitePreview();
+}
+
+function renderInviteEmailTags() {
+  const wrap = document.getElementById('inviteEmailTagInput');
+  wrap.querySelectorAll('.email-tag').forEach(t => t.remove());
+  INVITE_EMAILS.forEach(email => {
+    const tag = document.createElement('span');
+    tag.className = 'email-tag';
+    const isExternal = !email.endsWith('@dentallab.com');
+    tag.innerHTML = `${email}${isExternal ? ' <span style="opacity:.6; font-size:9px;">EXT</span>' : ''} <button onclick="removeInviteEmail('${email}')">×</button>`;
+    wrap.insertBefore(tag, document.getElementById('inviteEmailInputField'));
+  });
+}
+
+function isExistingUser(email) {
+  return STATE.cases.some(c => c.members.some(m => m.email.toLowerCase() === email.toLowerCase()));
+}
+
+function getKnownUsers() {
+  const map = new Map();
+  STATE.cases.forEach(c => {
+    c.members.forEach(m => {
+      if (!map.has(m.email.toLowerCase())) {
+        map.set(m.email.toLowerCase(), { name: m.name, email: m.email, role: m.role, avatar: m.avatar, isExternal: m.isExternal });
+      }
+    });
+  });
+  return Array.from(map.values());
+}
+
+let AC_TARGET = null; // 'invite' | 'newCase'
+let AC_ACTIVE_INDEX = -1;
+
+function showAutocomplete(target, query) {
+  const inputEl = target === 'invite' ? document.getElementById('inviteEmailInputField') : document.getElementById('emailInputField');
+  const wrapEl = target === 'invite' ? document.getElementById('inviteEmailTagInput') : document.getElementById('emailTagInput');
+  let listEl = document.getElementById('acList_' + target);
+
+  const q = (query || '').toLowerCase().trim();
+  const existing = target === 'invite'
+    ? (STATE.activeChat?.members || []).map(m => m.email.toLowerCase())
+    : [];
+  const pending = target === 'invite' ? INVITE_EMAILS : STATE.pendingEmails;
+
+  const matches = getKnownUsers()
+    .filter(u => !existing.includes(u.email.toLowerCase()))
+    .filter(u => !pending.includes(u.email.toLowerCase()))
+    .filter(u => q && (u.email.toLowerCase().includes(q) || u.name.toLowerCase().includes(q)))
+    .slice(0, 6);
+
+  if (!matches.length) { hideAutocomplete(target); return; }
+
+  if (!listEl) {
+    listEl = document.createElement('div');
+    listEl.className = 'autocomplete-list';
+    listEl.id = 'acList_' + target;
+    wrapEl.parentElement.style.position = 'relative';
+    wrapEl.parentElement.appendChild(listEl);
+  }
+  AC_ACTIVE_INDEX = -1;
+  listEl.innerHTML = matches.map((u, i) => `
+    <div class="autocomplete-item" data-idx="${i}" data-email="${u.email}" onmousedown="event.preventDefault(); pickAutocomplete('${target}', '${u.email}')">
+      <div class="avatar sm" style="background:${u.isExternal ? '#666' : '#444'};">${u.avatar}</div>
+      <div class="autocomplete-info">
+        <div class="autocomplete-name">${u.name}</div>
+        <div class="autocomplete-email">${u.email}</div>
+      </div>
+      <span class="autocomplete-tag ${u.isExternal ? 'external' : 'existing'}">${u.isExternal ? 'External' : 'Existing'}</span>
+    </div>
+  `).join('');
+  listEl.style.display = 'block';
+}
+
+function hideAutocomplete(target) {
+  const listEl = document.getElementById('acList_' + target);
+  if (listEl) listEl.style.display = 'none';
+  AC_ACTIVE_INDEX = -1;
+}
+
+function pickAutocomplete(target, email) {
+  const lower = email.toLowerCase();
+  if (target === 'invite') {
+    const inputEl = document.getElementById('inviteEmailInputField');
+    if (STATE.activeChat?.members.some(m => m.email.toLowerCase() === lower)) {
+      showToast('Already a member', `${email} is already part of this case.`, 'error');
+      return;
+    }
+    if (!INVITE_EMAILS.includes(lower)) INVITE_EMAILS.push(lower);
+    inputEl.value = '';
+    renderInviteEmailTags();
+    renderInvitePreview();
+    inputEl.focus();
+  } else {
+    const inputEl = document.getElementById('emailInputField');
+    if (!STATE.pendingEmails.includes(lower)) STATE.pendingEmails.push(lower);
+    inputEl.value = '';
+    renderEmailTags();
+    inputEl.focus();
+  }
+  hideAutocomplete(target);
+}
+
+function renderInvitePreview() {
+  const box = document.getElementById('invitePreview');
+  if (!INVITE_EMAILS.length) { box.innerHTML = ''; return; }
+
+  const existing = INVITE_EMAILS.filter(e => isExistingUser(e));
+  const newInternal = INVITE_EMAILS.filter(e => !isExistingUser(e) && e.endsWith('@dentallab.com'));
+  const newExternal = INVITE_EMAILS.filter(e => !isExistingUser(e) && !e.endsWith('@dentallab.com'));
+
+  const row = (label, count, hint) => count
+    ? `<div style="display:flex; justify-content:space-between; padding:6px 0; font-size:12px; border-bottom:1px dashed var(--border);">
+         <span style="color:var(--text-soft);">${label}</span>
+         <span style="font-weight:600;">${count} <span style="color:var(--text-mute); font-weight:400; font-size:11px;">· ${hint}</span></span>
+       </div>` : '';
+
+  box.innerHTML = `
+    <div style="background:var(--surface-2); border-radius:10px; padding:12px 14px;">
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-mute); margin-bottom:8px;">Invitation Summary</div>
+      ${row('Existing users', existing.length, 'notified')}
+      ${row('New @dentallab.com users', newInternal.length, 'register & join')}
+      ${row('External users', newExternal.length, 'auto-whitelist & invite')}
+    </div>
+  `;
+}
+
+function submitInvite() {
+  if (!INVITE_EMAILS.length) {
+    showToast('No emails added', 'Add at least one email to send invites.', 'error');
+    return;
+  }
+  const c = STATE.activeChat;
+  if (!c) return;
+
+  INVITE_EMAILS.forEach(email => {
+    const isExternal = !email.endsWith('@dentallab.com');
+    const existing = isExistingUser(email);
+    const initials = email.split('@')[0].split(/[._-]/).map(p => p[0]?.toUpperCase()).slice(0, 2).join('') || '??';
+    let role;
+    if (existing) role = isExternal ? 'External' : 'Member';
+    else role = isExternal ? 'External (invited)' : 'Member (invited)';
+
+    c.members.push({
+      name: email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      email,
+      role,
+      avatar: initials,
+      isAdmin: false,
+      isExternal
+    });
+    c.messages.push({ type: 'system', text: STATE.currentUser.name + (existing ? ' added ' : ' invited ') + email });
+  });
+
+  const total = INVITE_EMAILS.length;
+  const externalNew = INVITE_EMAILS.filter(e => !isExistingUser(e) && !e.endsWith('@dentallab.com')).length;
+  let msg = `${total} member${total > 1 ? 's' : ''} added to #${c.id}.`;
+  if (externalNew) msg += ` ${externalNew} external email${externalNew > 1 ? 's' : ''} auto-whitelisted.`;
+
+  INVITE_EMAILS = [];
+  closeModal('inviteMembersModal');
+  showToast('Invites sent', msg, 'success');
+
+  document.getElementById('chatHeaderMeta').textContent = `${c.members.length} members · ${c.doctor || 'No doctor assigned'}`;
+  renderInfoPanel();
+  renderMessages();
+}
+
+function mockDelete() {
+  if (confirm('Permanently delete this entire chat group? This action cannot be undone.')) {
+    STATE.cases = STATE.cases.filter(c => c.id !== STATE.activeChat.id);
+    STATE.activeChat = null;
+    document.getElementById('chatView').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'flex';
+    document.getElementById('app').classList.remove('with-info');
+    renderChats();
+    showToast('Group deleted', 'The case group has been permanently removed.', 'success');
+  }
+}
+
+// ===================================================================
+// NEW CASE MODAL
+// ===================================================================
+function openNewCaseModal() {
+  if (!STATE.currentUser.isAdmin) {
+    showToast('Admins only', 'Only admins can create new cases.', 'error');
+    return;
+  }
+  STATE.pendingEmails = [];
+  document.getElementById('newCaseId').value = '';
+  document.getElementById('newCaseTitle').value = '';
+  document.getElementById('newCasePatient').value = '';
+  document.getElementById('newCaseDoctor').value = '';
+  renderEmailTags();
+  document.getElementById('newCaseModal').classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function handleEmailInput(e) {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    moveAutocomplete('newCase', e.key === 'ArrowDown' ? 1 : -1);
+    return;
+  }
+  if (e.key === 'Escape') { hideAutocomplete('newCase'); return; }
+  if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+    e.preventDefault();
+    const list = document.getElementById('acList_newCase');
+    if (list && list.style.display !== 'none' && AC_ACTIVE_INDEX >= 0) {
+      const item = list.children[AC_ACTIVE_INDEX];
+      if (item) { pickAutocomplete('newCase', item.dataset.email); return; }
+    }
+    const v = e.target.value.trim().replace(/,$/, '').toLowerCase();
+    if (v && /\S+@\S+\.\S+/.test(v) && !STATE.pendingEmails.includes(v)) {
+      STATE.pendingEmails.push(v);
+      e.target.value = '';
+      renderEmailTags();
+      hideAutocomplete('newCase');
+    }
+  } else if (e.key === 'Backspace' && !e.target.value && STATE.pendingEmails.length) {
+    STATE.pendingEmails.pop();
+    renderEmailTags();
+  } else {
+    setTimeout(() => showAutocomplete('newCase', e.target.value), 0);
+  }
+}
+
+function moveAutocomplete(target, delta) {
+  const list = document.getElementById('acList_' + target);
+  if (!list || list.style.display === 'none') return;
+  const items = list.children;
+  if (!items.length) return;
+  AC_ACTIVE_INDEX = (AC_ACTIVE_INDEX + delta + items.length) % items.length;
+  Array.from(items).forEach((el, i) => el.classList.toggle('active', i === AC_ACTIVE_INDEX));
+}
+
+function removeEmail(email) {
+  STATE.pendingEmails = STATE.pendingEmails.filter(e => e !== email);
+  renderEmailTags();
+}
+
+function renderEmailTags() {
+  const wrap = document.getElementById('emailTagInput');
+  wrap.querySelectorAll('.email-tag').forEach(t => t.remove());
+  STATE.pendingEmails.forEach(email => {
+    const tag = document.createElement('span');
+    tag.className = 'email-tag';
+    const isExternal = !email.endsWith('@dentallab.com');
+    tag.innerHTML = `${email}${isExternal ? ' <span style="opacity:.6; font-size:9px;">EXT</span>' : ''} <button onclick="removeEmail('${email}')">×</button>`;
+    wrap.insertBefore(tag, document.getElementById('emailInputField'));
+  });
+}
+
+function createCase() {
+  const id = document.getElementById('newCaseId').value.trim();
+  if (!id) { showToast('Case ID required', 'Please enter a Case ID.', 'error'); return; }
+  if (STATE.cases.find(c => c.id === id)) {
+    showToast('Case exists', `Case #${id} already exists. Opening it.`, 'error');
+    closeModal('newCaseModal');
+    openChat(id);
+    return;
+  }
+
+  const newCase = {
+    id,
+    title: document.getElementById('newCaseTitle').value.trim() || '',
+    patient: document.getElementById('newCasePatient').value.trim() || '',
+    doctor: document.getElementById('newCaseDoctor').value.trim() || '',
+    createdAt: 'Just now',
+    members: [
+      { name: STATE.currentUser.name, email: STATE.currentUser.email, role: STATE.currentUser.role, avatar: STATE.currentUser.avatar, isAdmin: true, isExternal: false },
+      ...STATE.pendingEmails.map(email => {
+        const isExternal = !email.endsWith('@dentallab.com');
+        const initials = email.split('@')[0].split(/[._-]/).map(p => p[0]?.toUpperCase()).slice(0, 2).join('') || '??';
+        return {
+          name: email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          email,
+          role: isExternal ? 'External (invited)' : 'Member (invited)',
+          avatar: initials,
+          isAdmin: false,
+          isExternal
+        };
+      })
+    ],
+    messages: [
+      { type: 'system', text: STATE.currentUser.name + ' created this case' }
+    ]
+  };
+
+  STATE.cases.unshift(newCase);
+  closeModal('newCaseModal');
+
+  const externalCount = STATE.pendingEmails.filter(e => !e.endsWith('@dentallab.com')).length;
+  let msg = `Case #${id} created.`;
+  if (STATE.pendingEmails.length) {
+    msg += ` ${STATE.pendingEmails.length} invitation${STATE.pendingEmails.length > 1 ? 's' : ''} sent.`;
+    if (externalCount) msg += ` ${externalCount} external email${externalCount > 1 ? 's' : ''} auto-whitelisted.`;
+  }
+  showToast('Case created', msg, 'success');
+
+  renderChats();
+  openChat(id);
+}
+
+// ===================================================================
+// PUSH NOTIFICATIONS (PWA simulation)
+// ===================================================================
+function enableNotifications() {
+  if (STATE.notificationsEnabled) {
+    STATE.notificationsEnabled = false;
+    document.getElementById('notifBtn').classList.remove('active');
+    showToast('Notifications off', 'You won\'t receive push alerts.', 'success');
+    return;
+  }
+
+  // Try real Notification API (graceful fallback for demo)
+  if ('Notification' in window) {
+    Notification.requestPermission().then(perm => {
+      STATE.notificationsEnabled = (perm === 'granted');
+      if (perm === 'granted') {
+        document.getElementById('notifBtn').classList.add('active');
+        showToast('Notifications enabled', 'You\'ll get a push when teammates message you.', 'success');
+        scheduleMockPush();
+      } else if (perm === 'denied') {
+        showToast('Permission denied', 'Allow notifications in your browser settings.', 'error');
+      } else {
+        // Treat as soft-enabled for demo
+        STATE.notificationsEnabled = true;
+        document.getElementById('notifBtn').classList.add('active');
+        showToast('Notifications enabled (demo)', 'Browser blocked the prompt — running in demo mode.', 'success');
+        scheduleMockPush();
+      }
+    }).catch(() => {
+      STATE.notificationsEnabled = true;
+      document.getElementById('notifBtn').classList.add('active');
+      showToast('Notifications enabled (demo)', 'Demo mode — simulated incoming alerts.', 'success');
+      scheduleMockPush();
+    });
+  } else {
+    STATE.notificationsEnabled = true;
+    document.getElementById('notifBtn').classList.add('active');
+    showToast('Notifications enabled (demo)', 'Demo mode — simulated incoming alerts.', 'success');
+    scheduleMockPush();
+  }
+}
+
+function scheduleMockPush() {
+  setTimeout(() => {
+    if (!STATE.notificationsEnabled) return;
+    const samples = [
+      { case: '5678412', from: 'Aisha Khan', text: 'Shade match looks good now.' },
+      { case: '5678656', from: 'Dr. Patel', text: 'Quick update on the patient...' },
+      { case: '5677321', from: 'Tom Wright', text: 'Framework done.' }
+    ];
+    const pick = samples[Math.floor(Math.random() * samples.length)];
+    showToast(`#${pick.case} · ${pick.from}`, pick.text, 'success');
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try { new Notification(`#${pick.case} · ${pick.from}`, { body: pick.text }); } catch(_) {}
+    }
+    scheduleMockPush();
+  }, 25000 + Math.random() * 20000);
+}
+
+// ===================================================================
+// WHITELIST MANAGEMENT (Admin)
+// ===================================================================
+function openWhitelistModal() {
+  if (!STATE.currentUser.isAdmin) {
+    showToast('Admins only', 'Only admins can manage the whitelist.', 'error');
+    return;
+  }
+  renderWhitelist();
+  document.getElementById('whitelistAddInput').value = '';
+  document.getElementById('whitelistModal').classList.add('show');
+}
+
+function renderWhitelist() {
+  const list = document.getElementById('whitelistList');
+  document.getElementById('whitelistCount').textContent = STATE.whitelist.length;
+  if (!STATE.whitelist.length) {
+    list.innerHTML = `<div style="font-size:13px; color:var(--text-mute); padding:12px 0; text-align:center;">No external emails whitelisted yet.</div>`;
+    return;
+  }
+  list.innerHTML = STATE.whitelist.map(w => `
+    <div class="whitelist-row">
+      <div class="avatar sm" style="background:#666;">${w.email.slice(0,2).toUpperCase()}</div>
+      <div class="whitelist-info">
+        <div class="whitelist-email">${w.email}</div>
+        <div class="whitelist-meta">Added by ${w.addedBy} · ${w.addedAt}</div>
+      </div>
+      <button class="whitelist-remove" onclick="removeFromWhitelist('${w.email}')" title="Remove">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function addToWhitelist() {
+  const input = document.getElementById('whitelistAddInput');
+  const email = input.value.trim().toLowerCase();
+  if (!email) return;
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    showToast('Invalid email', `"${email}" is not a valid email.`, 'error');
+    return;
+  }
+  if (email.endsWith('@dentallab.com')) {
+    showToast('Internal domain', '@dentallab.com emails are auto-allowed and don\'t need whitelisting.', 'error');
+    return;
+  }
+  if (STATE.whitelist.some(w => w.email === email)) {
+    showToast('Already whitelisted', `${email} is already on the list.`, 'error');
+    return;
+  }
+  STATE.whitelist.push({
+    email,
+    addedBy: STATE.currentUser.name,
+    addedAt: 'Just now'
+  });
+  input.value = '';
+  renderWhitelist();
+  showToast('Whitelisted', `Login/register email sent to ${email}.`, 'success');
+}
+
+function removeFromWhitelist(email) {
+  if (!confirm(`Remove ${email} from the whitelist? They will lose access.`)) return;
+  STATE.whitelist = STATE.whitelist.filter(w => w.email !== email);
+  renderWhitelist();
+  showToast('Removed', `${email} removed from whitelist.`, 'success');
+}
+
+// ===================================================================
+// THEME
+// ===================================================================
+function toggleTheme() {
+  STATE.theme = STATE.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', STATE.theme);
+  document.getElementById('themeIcon').innerHTML = STATE.theme === 'dark'
+    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    : '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>';
+}
+
+// ===================================================================
+// TOAST
+// ===================================================================
+function showToast(title, body, type = 'success') {
+  if (typeof body !== 'string') { type = body || 'success'; body = ''; }
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `
+    <div class="toast-icon">
+      ${type === 'success'
+        ? '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>'
+        : '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>'
+      }
+    </div>
+    <div class="toast-text">
+      ${body ? '<b>' + title + '</b>' + body : title}
+    </div>
+  `;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => {
+    t.classList.add('out');
+    setTimeout(() => t.remove(), 250);
+  }, 3500);
+}
+
+// ===================================================================
+// INIT
+// ===================================================================
+(function restoreSession() {
+  let saved = null;
+  try { saved = localStorage.getItem('dchat:user'); } catch (e) {}
+  if (saved) {
+    PENDING_LOGIN_EMAIL = saved;
+    finalizeLogin({ animate: false });
+  } else {
+    renderChats();
+  }
+})();
+</script>
+</body>
+</html>
