@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dental Lab Case Chat — Project Scope</title>
+<title>Dental Lab Case Chat — Project Requirements</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=DM+Sans:opsz,wght@9..40,300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -457,7 +457,7 @@
     <div>
       <div class="masthead-meta">
         <span class="dot"></span>
-        <span>Project Scope · v1.6 · Light</span>
+        <span>Project Requirements · v1.8 · Light</span>
       </div>
       <h1>Dental Lab<br><em>Case Chat.</em></h1>
     </div>
@@ -504,6 +504,7 @@
           <li>Restricted to @dentallab.com emails</li>
           <li>External emails allowed only if whitelisted by admin</li>
           <li>Non-whitelisted users see "contact admin" message</li>
+          <li>Logout fully clears in-memory session state (cases, pins, mutes, archive, unread, filters)</li>
         </ul>
       </div>
 
@@ -566,12 +567,13 @@
         </div>
         <ul>
           <li>List of joined chats</li>
-          <li>Search by Case ID</li>
-          <li>Pagination (10 chats at a time)</li>
+          <li>Search: partial match on case ID + title across joined chats</li>
+          <li>Search: exact case-ID also surfaces non-joined cases under "Cases you can request to join"</li>
+          <li>Pagination (10 chats at a time, hidden when only one page)</li>
           <li>Unread message count badge per chat</li>
-          <li>Pin chats — pinned cases float to the top of the list</li>
+          <li>Pin chats — pinned cases float to the top</li>
           <li>Filter chats by status (All · Impression · Production · Approval · Shipped · Completed)</li>
-          <li>Archive / unarchive chats — archived row at top of Joined opens a sub-view (WhatsApp-style)</li>
+          <li>Archive / unarchive — archived row at top of Joined opens a sub-view (WhatsApp-style)</li>
         </ul>
       </div>
 
@@ -604,8 +606,8 @@
           <h3 class="feat-title">Roles &amp; Permissions</h3>
         </div>
         <ul>
-          <li><strong>Admin:</strong> create case, edit case details, delete entire group, manage members, kick / remove users, manage whitelist</li>
-          <li><strong>Regular user:</strong> join, send messages &amp; files</li>
+          <li><strong>Admin:</strong> create case, edit case details, delete entire group, manage members, kick / remove users, manage whitelist, approve join requests</li>
+          <li><strong>Regular user:</strong> join, send messages &amp; files, request to join external cases by exact ID</li>
         </ul>
       </div>
 
@@ -615,7 +617,7 @@
           <h3 class="feat-title">Case Status Indicators</h3>
         </div>
         <ul>
-          <li>Workflow tags per case (e.g., Impression Received, In Production, Awaiting Approval, Shipped)</li>
+          <li>Workflow tags per case (Impression Received, In Production, Awaiting Approval, Shipped, Completed)</li>
           <li>Admin sets &amp; updates status</li>
           <li>Status visible on Chat Dashboard and Group Info Screen</li>
         </ul>
@@ -651,7 +653,7 @@
           <li>Emoji reactions</li>
           <li>Typing indicator</li>
           <li>Read receipts / Seen by</li>
-          <li>Individual message edit / delete</li>
+          <li>Message edit / delete</li>
           <li>Message forwarding</li>
           <li>Bookmark / Star messages</li>
         </ul>
@@ -660,18 +662,17 @@
       <div class="excluded-group">
         <h3>Chat &amp; Group</h3>
         <ul>
-          <li>Chat filters by Pinned / Muted / Unread</li>
-          <li>Favorites</li>
-          <li>Users leaving groups voluntarily</li>
+          <li>Filter by Pinned / Muted / Unread (Status filter only)</li>
           <li>Auto-archive of inactive cases (manual archive only)</li>
+          <li>Users leaving groups voluntarily (admin removes only)</li>
         </ul>
       </div>
 
       <div class="excluded-group">
         <h3>Notifications</h3>
         <ul>
-          <li>Advanced notification preferences</li>
-          <li>Sound toggle / desktop browser notifications</li>
+          <li>Per-chat notification preferences (mute is the only control)</li>
+          <li>Sound toggle</li>
           <li>In-app notification bell with list</li>
         </ul>
       </div>
@@ -706,7 +707,7 @@
           <div class="phase-desc">Foundation. Auth, profile, case creation, member onboarding, and core messaging.</div>
         </div>
         <ul class="phase-items">
-          <li>Authentication</li>
+          <li>Authentication + logout state reset</li>
           <li>User Profile + Admin badge</li>
           <li>Case Creation (admin only)</li>
           <li>Member add + invitation flow</li>
@@ -724,6 +725,7 @@
           <div class="phase-desc">Open the system up. Richer messaging, self-service join, notifications, and theming.</div>
         </div>
         <ul class="phase-items">
+          <li>Search (partial for joined, exact ID for joinable)</li>
           <li>Join request + admin approval</li>
           <li>Pagination</li>
           <li>Quote / Reply</li>
@@ -766,7 +768,7 @@
     </div>
     <div class="footer-block">
       <strong>Document</strong>
-      <p>This is a working scope. Anything not listed in §01 In Scope is implicitly out of scope, regardless of whether §02 lists it.</p>
+      <p>This is a working requirements doc. Anything not listed in §01 In Scope is implicitly out of scope, regardless of whether §02 lists it.</p>
     </div>
   </footer>
 

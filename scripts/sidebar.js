@@ -28,7 +28,7 @@ function renderChats() {
   const statusFiltered = STATE.statusFilter && STATE.statusFilter !== 'all'
     ? viewPool.filter(c => c.status === STATE.statusFilter)
     : viewPool;
-  const pool = filterPool(statusFiltered, search, isAdmin);
+  const pool = filterPool(statusFiltered, search);
   renderChatListBody(pool, view, search, isAdmin);
   renderPaginationFooter(pool.length);
 
@@ -149,31 +149,62 @@ function sortJoined(cases) {
   return cases.slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 }
 
-function filterPool(pool, search, isAdmin) {
+// Partial match on case ID + title for both admins and non-admins. Privacy
+// for non-admins is preserved by the fact that the Discover tab is hidden
+// from them — non-joined cases only surface via the "Cases you can request
+// to join" section in renderChatListBody, which requires an exact case-ID
+// match (so users can't browse other people's cases by partial text).
+function filterPool(pool, search) {
   if (!search) return pool;
-  if (isAdmin) {
-    return pool.filter(c => c.id.includes(search) || (c.title || '').toLowerCase().includes(search.toLowerCase()));
-  }
-  return pool.filter(c => c.id === search);
+  const q = search.toLowerCase();
+  return pool.filter(c =>
+    c.id.includes(search) ||
+    (c.title || '').toLowerCase().includes(q)
+  );
 }
 
 function renderChatListBody(pool, view, search, isAdmin) {
   const list = document.getElementById('chatList');
-  const total = pool.length;
 
-  if (total === 0) {
+  // Non-admins can't browse the Discover tab. When they search by an exact
+  // case ID, surface that non-joined case under a "Request to join" section
+  // so they can request access without needing browse permission.
+  const joinableMatches = (!isAdmin && view === 'joined' && search)
+    ? findJoinableByExactId(search)
+    : [];
+
+  // Empty: no joined matches AND nothing joinable.
+  if (pool.length === 0 && joinableMatches.length === 0) {
     list.innerHTML = emptyChatListHtml(view, search, isAdmin);
     return;
   }
 
-  const totalPages = Math.max(1, Math.ceil(total / STATE.casesPerPage));
-  if (STATE.currentPage > totalPages) STATE.currentPage = totalPages;
-  const start = (STATE.currentPage - 1) * STATE.casesPerPage;
-  const paginated = pool.slice(start, start + STATE.casesPerPage);
+  let body = '';
 
-  list.innerHTML = paginated
-    .map(c => view === 'discover' ? renderDiscoverItem(c) : renderJoinedItem(c))
-    .join('');
+  if (pool.length > 0) {
+    const totalPages = Math.max(1, Math.ceil(pool.length / STATE.casesPerPage));
+    if (STATE.currentPage > totalPages) STATE.currentPage = totalPages;
+    const start = (STATE.currentPage - 1) * STATE.casesPerPage;
+    const paginated = pool.slice(start, start + STATE.casesPerPage);
+    body = paginated
+      .map(c => view === 'discover' ? renderDiscoverItem(c) : renderJoinedItem(c))
+      .join('');
+  }
+
+  if (joinableMatches.length > 0) {
+    body += `
+      <div class="search-section-header">Cases you can request to join</div>
+      ${joinableMatches.map(c => renderDiscoverItem(c)).join('')}
+    `;
+  }
+
+  list.innerHTML = body;
+}
+
+function findJoinableByExactId(search) {
+  return STATE.cases.filter(c =>
+    !isMember(c) && !c.archived && c.id === search
+  );
 }
 
 function emptyChatListHtml(view, search, isAdmin) {
@@ -271,6 +302,8 @@ function muteIconSvg() {
 function renderDiscoverItem(c) {
   const requested = hasPendingRequest(c);
   const isAdmin = STATE.currentUser.isAdmin;
+  // Show doctor + patient (case-level info). Member count is intentionally
+  // dropped — it only exposed group identity without helping the user decide.
   const subtitle = `${c.doctor || 'No doctor assigned'}${c.patient ? ' · ' + c.patient : ''}`;
   const action = isAdmin
     ? `<button class="discover-action" onclick="event.stopPropagation(); directJoin('${c.id}')">Join</button>`
@@ -286,7 +319,7 @@ function renderDiscoverItem(c) {
       <div class="chat-item-content">
         <div class="chat-item-top">
           <span class="chat-item-id">#${c.id}</span>
-          <span class="chat-item-time">${c.members.length} member${c.members.length === 1 ? '' : 's'}</span>
+          <span class="chat-item-time">${c.createdAt}</span>
         </div>
         <div class="chat-item-title">${c.title || '—'}</div>
         <div class="chat-item-preview">${subtitle}</div>

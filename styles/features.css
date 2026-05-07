@@ -12,7 +12,20 @@
    10. Filter chats by status
    11. Online / Offline / Last Seen presence
    12. Archive chats (WhatsApp-style)
+   13. Search "Request to join" section
    =================================================================== */
+
+/* ============ 13. SEARCH "REQUEST TO JOIN" SECTION ============ */
+.search-section-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mute);
+  padding: 14px 12px 6px;
+  margin-top: 8px;
+  border-top: 1px dashed var(--border);
+}
 
 /* ============ 1. UNREAD BADGE ============ */
 .chat-item-bottom {

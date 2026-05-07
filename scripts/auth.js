@@ -147,7 +147,9 @@ function logout() {
 // the seeded cases / whitelist, and the per-feature transient variables
 // (composer files, reply target, mention popup, modal autocomplete).
 function resetSessionState() {
-  // STATE — back to defaults
+  // STATE — back to defaults. freshCases() rebuilds from the pristine
+  // MOCK_CASES seed, which clears any per-session archive / pin / mute /
+  // unread / status changes the user made during the session.
   STATE.currentUser         = { ...INITIAL_CURRENT_USER };
   STATE.cases               = freshCases();
   STATE.whitelist           = JSON.parse(JSON.stringify(INITIAL_WHITELIST));
