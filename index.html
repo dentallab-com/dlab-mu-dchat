@@ -196,6 +196,16 @@
         </div>
         <div class="chat-header-status" id="chatHeaderStatus"></div>
         <div class="chat-header-actions">
+          <button class="icon-btn" id="pinBtn" onclick="togglePin()" title="Pin chat">
+            <svg class="icon" id="pinIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 4l6 6-3 1-1 5-3-3-5 5v-2l3-3-3-3 5-1 1-3 0-2z"/>
+            </svg>
+          </button>
+          <button class="icon-btn" id="muteBtn" onclick="toggleMute()" title="Mute notifications">
+            <svg class="icon" id="muteIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </button>
           <button class="icon-btn" onclick="toggleInfoPanel()" title="Group info">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>

@@ -80,6 +80,8 @@ function deliverMockPush(pick) {
     }
     renderChats();
   }
+  // Muted chats still update unread silently; they just don't surface a push.
+  if (target?.muted) return;
   showToast(`#${pick.case} · ${pick.from}`, pick.text, 'success');
   if ('Notification' in window && Notification.permission === 'granted') {
     try { new Notification(`#${pick.case} · ${pick.from}`, { body: pick.text }); } catch (_) {}

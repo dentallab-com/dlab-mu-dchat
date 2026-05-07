@@ -7,6 +7,8 @@
    5. Quote / Reply
    6. @Mention autocomplete
    7. Member remove (admin kick)
+   8. Pin chats
+   9. Mute toggle per chat
    =================================================================== */
 
 /* ============ 1. UNREAD BADGE ============ */
@@ -389,6 +391,49 @@ button.status-pill::after {
   color: var(--text-mute);
   text-align: center;
 }
+
+/* ============ 8. PIN CHATS ============ */
+.chat-item-pin {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-left: 6px;
+  color: var(--red);
+  vertical-align: -1px;
+}
+
+.chat-item.pinned {
+  background: rgba(223, 41, 38, 0.04);
+}
+.chat-item.pinned:hover { background: var(--red-soft); }
+.chat-item.pinned.active { background: var(--red-soft); }
+[data-theme="dark"] .chat-item.pinned { background: rgba(252, 44, 34, 0.06); }
+[data-theme="dark"] .chat-item.pinned:hover,
+[data-theme="dark"] .chat-item.pinned.active { background: var(--surface-2); }
+
+/* Pin button in chat header — red when pinned */
+#pinBtn.active { color: var(--red); }
+#pinBtn.active svg { fill: var(--red); }
+
+/* ============ 9. MUTE TOGGLE ============ */
+.chat-item-mute {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  color: var(--text-mute);
+  vertical-align: -2px;
+}
+
+/* Muted chats get a desaturated unread badge — count still shown,
+   but the visual urgency is removed. */
+.chat-item-unread.muted {
+  background: var(--text-mute);
+  box-shadow: none;
+}
+
+/* Mute button in chat header — red when muted (matches pinBtn pattern) */
+#muteBtn.active { color: var(--red); }
 
 /* ============ 7. MEMBER REMOVE (KICK) ============ */
 .member { position: relative; }

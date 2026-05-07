@@ -9,7 +9,7 @@ function renderChats() {
   const isAdmin = STATE.currentUser.isAdmin;
   const view = isAdmin ? STATE.view : 'joined';
 
-  const joinedCases = STATE.cases.filter(isMember);
+  const joinedCases = sortJoined(STATE.cases.filter(isMember));
   const discoverCases = STATE.cases.filter(c => !isMember(c));
 
   document.getElementById('joinedCount').textContent = joinedCases.length;
@@ -20,6 +20,11 @@ function renderChats() {
   renderPaginationFooter(pool.length);
 
   document.getElementById('whitelistBtn').style.display = isAdmin ? 'flex' : 'none';
+}
+
+// Pinned cases float to the top; relative order within each group is preserved.
+function sortJoined(cases) {
+  return cases.slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 }
 
 function filterPool(pool, search, isAdmin) {
@@ -97,16 +102,16 @@ function renderJoinedItem(c) {
   const active = STATE.activeChat?.id === c.id ? 'active' : '';
   const unread = c.unread || 0;
   const unreadBadge = unread > 0
-    ? `<span class="chat-item-unread">${unread > 99 ? '99+' : unread}</span>`
+    ? `<span class="chat-item-unread${c.muted ? ' muted' : ''}">${unread > 99 ? '99+' : unread}</span>`
     : '';
 
   return `
-    <div class="chat-item ${active}" onclick="openChat('${c.id}')">
+    <div class="chat-item ${active}${c.pinned ? ' pinned' : ''}" onclick="openChat('${c.id}')">
       <div class="avatar" style="background:${getColorForId(c.id)}">${c.id.slice(-2)}</div>
       <div class="chat-item-content">
         <div class="chat-item-top">
-          <span class="chat-item-id">#${c.id}</span>
-          <span class="chat-item-time">${time}</span>
+          <span class="chat-item-id">#${c.id}${c.pinned ? pinIconSvg() : ''}</span>
+          <span class="chat-item-time">${c.muted ? muteIconSvg() : ''}${time}</span>
         </div>
         <div class="chat-item-title">${c.title || '—'}</div>
         <div class="chat-item-bottom">
@@ -119,6 +124,14 @@ function renderJoinedItem(c) {
       </div>
     </div>
   `;
+}
+
+function pinIconSvg() {
+  return `<svg class="chat-item-pin" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round"><path d="M14 4l6 6-3 1-1 5-3-3-5 5v-2l3-3-3-3 5-1 1-3 0-2z"/></svg>`;
+}
+
+function muteIconSvg() {
+  return `<svg class="chat-item-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0M18.63 13A17 17 0 0 1 18 8M6.26 6.26A6 6 0 0 0 6 8c0 7-3 9-3 9h14M18 8a6 6 0 0 0-9.33-5M1 1l22 22"/></svg>`;
 }
 
 function renderDiscoverItem(c) {

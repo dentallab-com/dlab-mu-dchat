@@ -17,11 +17,55 @@ function openChat(id) {
   showChatView();
   setChatHeader(c);
   renderHeaderStatus();
+  updatePinMuteButtons();
   renderMessages();
   renderInfoPanel();
   renderChats();
 
   document.getElementById('app').classList.add('chat-open');
+}
+
+// ---------- Pin / mute ----------
+
+function updatePinMuteButtons() {
+  const c = STATE.activeChat;
+  if (!c) return;
+  const pinBtn = document.getElementById('pinBtn');
+  const muteBtn = document.getElementById('muteBtn');
+  pinBtn.classList.toggle('active', !!c.pinned);
+  pinBtn.title = c.pinned ? 'Unpin chat' : 'Pin chat';
+  muteBtn.classList.toggle('active', !!c.muted);
+  muteBtn.title = c.muted ? 'Unmute notifications' : 'Mute notifications';
+  // Swap mute icon between bell and bell-off
+  document.getElementById('muteIcon').innerHTML = c.muted
+    ? '<path d="M13.73 21a2 2 0 0 1-3.46 0M18.63 13A17 17 0 0 1 18 8M6.26 6.26A6 6 0 0 0 6 8c0 7-3 9-3 9h14M18 8a6 6 0 0 0-9.33-5M1 1l22 22"/>'
+    : '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>';
+}
+
+function togglePin() {
+  const c = STATE.activeChat;
+  if (!c) return;
+  c.pinned = !c.pinned;
+  updatePinMuteButtons();
+  renderChats();
+  showToast(
+    c.pinned ? 'Pinned' : 'Unpinned',
+    c.pinned ? `#${c.id} pinned to top.` : `#${c.id} removed from pinned.`,
+    'success'
+  );
+}
+
+function toggleMute() {
+  const c = STATE.activeChat;
+  if (!c) return;
+  c.muted = !c.muted;
+  updatePinMuteButtons();
+  renderChats();
+  showToast(
+    c.muted ? 'Muted' : 'Unmuted',
+    c.muted ? `You won't get push alerts for #${c.id}.` : `Notifications resumed for #${c.id}.`,
+    'success'
+  );
 }
 
 function resetComposerOnChatSwitch() {
