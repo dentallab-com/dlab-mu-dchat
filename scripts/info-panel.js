@@ -63,14 +63,14 @@ function renderMemberRow(m, c, isAdmin, me) {
   const canKick = isAdmin && m.email !== me && !m.isAdmin;
   return `
     <div class="member">
-      <div class="avatar sm" style="background:${m.isAdmin ? '#DF2926' : '#444444'}">${escapeHtml(m.avatar)}</div>
+      <div class="avatar sm" style="background:${m.isAdmin ? '#DF2926' : '#444444'}">${escapeHtml(m.avatar)}${presenceDot(m.email)}</div>
       <div class="member-info">
         <div class="member-name">
           ${escapeHtml(m.name)}
           ${m.isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
           ${m.isExternal ? '<span class="admin-badge" style="background:#666;">Ext</span>' : ''}
         </div>
-        <div class="member-role">${escapeHtml(m.role)}</div>
+        <div class="member-role">${escapeHtml(m.role)} · ${presenceLabel(m.email)}</div>
       </div>
       ${canKick ? renderKickButton(m.email) : ''}
     </div>

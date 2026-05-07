@@ -1,14 +1,16 @@
 /* ===================================================================
    FEATURE STYLES
-   1. Unread message count badge
-   2. Case status pill + picker
-   3. File gallery
-   4. Drag & drop upload
-   5. Quote / Reply
-   6. @Mention autocomplete
-   7. Member remove (admin kick)
-   8. Pin chats
-   9. Mute toggle per chat
+    1. Unread message count badge
+    2. Case status pill + picker
+    3. File gallery
+    4. Drag & drop upload
+    5. Quote / Reply
+    6. @Mention autocomplete
+    7. Member remove (admin kick)
+    8. Pin chats
+    9. Mute toggle per chat
+   10. Filter chats by status
+   11. Online / Offline / Last Seen presence
    =================================================================== */
 
 /* ============ 1. UNREAD BADGE ============ */
@@ -391,6 +393,65 @@ button.status-pill::after {
   color: var(--text-mute);
   text-align: center;
 }
+
+/* ============ 10. STATUS FILTER PILLS ============ */
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.status-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-soft);
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+.status-filter-pill:hover {
+  background: var(--border);
+  color: var(--text);
+}
+.status-filter-pill.active {
+  color: var(--text);
+}
+.status-filter-pill .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============ 11. PRESENCE DOT ============ */
+.presence-dot {
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  z-index: 2;
+  box-shadow: 0 0 0 0.5px rgba(0,0,0,0.05);
+}
+.avatar.sm .presence-dot {
+  width: 9px; height: 9px;
+  border-width: 1.5px;
+}
+.avatar.lg .presence-dot {
+  width: 14px; height: 14px;
+  border-width: 2.5px;
+}
+/* When the avatar sits inside something darker (e.g. a chat header on
+   surface), the border still reads as separation thanks to var(--surface). */
 
 /* ============ 8. PIN CHATS ============ */
 .chat-item-pin {

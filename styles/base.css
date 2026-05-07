@@ -38,7 +38,7 @@ input, textarea {
   font-weight: 600;
   font-size: 14px;
   flex-shrink: 0;
-  overflow: hidden;
+  position: relative;
 }
 
 .avatar.lg { width: 64px; height: 64px; font-size: 22px; }

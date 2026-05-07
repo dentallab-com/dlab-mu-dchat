@@ -163,9 +163,10 @@ function renderMsg(m, idx) {
   if (m.type === 'system') {
     return `<div class="system-msg">${escapeHtml(m.text)}</div>`;
   }
+  const senderEmail = m.own ? STATE.currentUser.email : emailForSender(m.sender);
   return `
     <div class="msg ${m.own ? 'own' : ''}" data-idx="${idx}">
-      <div class="avatar sm" style="background:${m.own ? '#DF2926' : '#444444'}">${escapeHtml(m.avatar)}</div>
+      <div class="avatar sm" style="background:${m.own ? '#DF2926' : '#444444'}">${escapeHtml(m.avatar)}${presenceDot(senderEmail)}</div>
       <div class="msg-bubble-wrap">
         ${renderMsgMeta(m)}
         ${renderMsgBubble(m)}
@@ -173,6 +174,14 @@ function renderMsg(m, idx) {
       </div>
     </div>
   `;
+}
+
+// Messages store the sender's name, not email. Look up the email so we can
+// render their presence dot. Returns null for senders not in the active chat.
+function emailForSender(senderName) {
+  if (!STATE.activeChat) return null;
+  const m = STATE.activeChat.members.find(mem => mem.name === senderName);
+  return m?.email || null;
 }
 
 function renderMsgMeta(m) {

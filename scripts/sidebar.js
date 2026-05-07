@@ -15,11 +15,48 @@ function renderChats() {
   document.getElementById('joinedCount').textContent = joinedCases.length;
   document.getElementById('discoverCount').textContent = discoverCases.length;
 
-  const pool = filterPool(view === 'joined' ? joinedCases : discoverCases, search, isAdmin);
+  const viewPool = view === 'joined' ? joinedCases : discoverCases;
+  renderStatusFilter(viewPool);
+
+  const statusFiltered = STATE.statusFilter && STATE.statusFilter !== 'all'
+    ? viewPool.filter(c => c.status === STATE.statusFilter)
+    : viewPool;
+  const pool = filterPool(statusFiltered, search, isAdmin);
   renderChatListBody(pool, view, search, isAdmin);
   renderPaginationFooter(pool.length);
 
   document.getElementById('whitelistBtn').style.display = isAdmin ? 'flex' : 'none';
+}
+
+// ---------- Status filter pills ----------
+
+function renderStatusFilter(viewPool) {
+  const wrap = document.getElementById('statusFilter');
+  if (!wrap) return;
+  const counts = { all: viewPool.length };
+  STATUS_ORDER.forEach(k => { counts[k] = viewPool.filter(c => c.status === k).length; });
+
+  const allActive = STATE.statusFilter === 'all' ? 'active' : '';
+  const allPill = `<button class="status-filter-pill ${allActive}" onclick="setStatusFilter('all')">All · ${counts.all}</button>`;
+
+  const statusPills = STATUS_ORDER.map(k => {
+    const meta = STATUS_META[k];
+    const active = STATE.statusFilter === k;
+    const activeStyle = active
+      ? `background:${meta.bg}; color:${meta.color}; border-color:${meta.dot};`
+      : '';
+    return `<button class="status-filter-pill ${active ? 'active' : ''}" style="${activeStyle}" onclick="setStatusFilter('${k}')" title="${meta.label}">
+      <span class="dot" style="background:${meta.dot};"></span>${meta.short} · ${counts[k]}
+    </button>`;
+  }).join('');
+
+  wrap.innerHTML = allPill + statusPills;
+}
+
+function setStatusFilter(key) {
+  STATE.statusFilter = key;
+  STATE.currentPage = 1;
+  renderChats();
 }
 
 // Pinned cases float to the top; relative order within each group is preserved.
@@ -166,6 +203,7 @@ function renderDiscoverItem(c) {
 
 function switchView(v) {
   STATE.view = v;
+  STATE.statusFilter = 'all';
   STATE.currentPage = 1;
   document.querySelectorAll('.view-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.view === v);

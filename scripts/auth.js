@@ -92,7 +92,8 @@ function setCurrentUserFromEmail(email) {
 function updateUserChip(user) {
   document.getElementById('userName').textContent = user.name;
   document.getElementById('userRole').textContent = user.role;
-  document.getElementById('userAvatar').textContent = user.avatar;
+  // innerHTML (not textContent) so the presence dot can sit on the avatar.
+  document.getElementById('userAvatar').innerHTML = escapeHtml(user.avatar) + presenceDot(user.email);
   document.getElementById('userBadge').style.display = user.isAdmin ? 'inline-block' : 'none';
 }
 

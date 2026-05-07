@@ -18,6 +18,7 @@ const STATE = {
   pendingEmails: [],
   theme: 'light',
   view: 'joined',           // 'joined' | 'discover'
+  statusFilter: 'all',      // 'all' | one of STATUS_ORDER keys
   currentPage: 1,
   casesPerPage: 10,
   whitelist: [
@@ -256,11 +257,11 @@ STATE.cases = MOCK_CASES;
 // CASE STATUS CONFIG
 // ===================================================================
 const STATUS_META = {
-  impression: { label: 'Impression Received', dot: '#3B82F6', color: '#1D4ED8', bg: 'rgba(59,130,246,0.14)' },
-  production: { label: 'In Production',       dot: '#DF2926', color: '#A2171B', bg: 'rgba(223,41,38,0.14)' },
-  approval:   { label: 'Awaiting Approval',   dot: '#F59E0B', color: '#B45309', bg: 'rgba(245,158,11,0.18)' },
-  shipped:    { label: 'Shipped',             dot: '#2D6A4F', color: '#2D6A4F', bg: 'rgba(45,106,79,0.16)' },
-  completed:  { label: 'Completed',           dot: '#888888', color: '#555555', bg: 'rgba(120,120,120,0.16)' }
+  impression: { label: 'Impression Received', short: 'Impression', dot: '#3B82F6', color: '#1D4ED8', bg: 'rgba(59,130,246,0.14)' },
+  production: { label: 'In Production',       short: 'Production', dot: '#DF2926', color: '#A2171B', bg: 'rgba(223,41,38,0.14)' },
+  approval:   { label: 'Awaiting Approval',   short: 'Approval',   dot: '#F59E0B', color: '#B45309', bg: 'rgba(245,158,11,0.18)' },
+  shipped:    { label: 'Shipped',             short: 'Shipped',    dot: '#2D6A4F', color: '#2D6A4F', bg: 'rgba(45,106,79,0.16)' },
+  completed:  { label: 'Completed',           short: 'Completed',  dot: '#888888', color: '#555555', bg: 'rgba(120,120,120,0.16)' }
 };
 const STATUS_ORDER = ['impression', 'production', 'approval', 'shipped', 'completed'];
 
@@ -311,4 +312,41 @@ function statusButton(statusKey) {
   return `<button class="status-pill" onclick="event.stopPropagation(); toggleStatusPicker();" style="background:${meta.bg}; color:${meta.color};">
     <span class="dot" style="background:${meta.dot};"></span>${meta.label}
   </button>`;
+}
+
+// ===================================================================
+// PRESENCE (Online / Away / Offline + Last Seen)
+// One source of truth keyed by email; same person shows the same status
+// in every case they belong to.
+// ===================================================================
+const PRESENCE = {
+  'faisal.ahmed@dentallab.com': { status: 'online',  lastSeen: 'Now' },
+  'rifat@dentallab.com':        { status: 'online',  lastSeen: 'Now' },
+  'aisha.khan@dentallab.com':   { status: 'away',    lastSeen: '30m ago' },
+  'tom.wright@dentallab.com':   { status: 'offline', lastSeen: '2h ago' },
+  'r.patel@brightsmile.com':    { status: 'online',  lastSeen: 'Now' },
+  's.hassan@brightsmile.com':   { status: 'offline', lastSeen: '1d ago' },
+  'h.brennan@familycare.com':   { status: 'offline', lastSeen: '4h ago' }
+};
+
+const PRESENCE_COLOR = { online: '#10B981', away: '#F59E0B', offline: '#9A9A95' };
+
+function presenceFor(email) {
+  return PRESENCE[email] || { status: 'offline', lastSeen: 'Unknown' };
+}
+
+// Small colored circle overlay on an avatar. Returns '' for offline so the
+// dot doesn't visually clutter inactive members.
+function presenceDot(email) {
+  const p = presenceFor(email);
+  if (p.status === 'offline') return '';
+  return `<span class="presence-dot" style="background:${PRESENCE_COLOR[p.status]};"></span>`;
+}
+
+// Human-readable presence text for member rows.
+function presenceLabel(email) {
+  const p = presenceFor(email);
+  if (p.status === 'online') return 'Online';
+  if (p.status === 'away')   return `Away · last seen ${p.lastSeen}`;
+  return `Last seen ${p.lastSeen}`;
 }
