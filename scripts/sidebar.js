@@ -9,14 +9,21 @@ function renderChats() {
   const isAdmin = STATE.currentUser.isAdmin;
   const view = isAdmin ? STATE.view : 'joined';
 
-  const joinedCases = sortJoined(STATE.cases.filter(isMember));
-  const discoverCases = STATE.cases.filter(c => !isMember(c));
+  const allJoined      = sortJoined(STATE.cases.filter(isMember));
+  const joinedActive   = allJoined.filter(c => !c.archived);
+  const joinedArchived = allJoined.filter(c =>  c.archived);
+  const discoverCases  = STATE.cases.filter(c => !isMember(c));
 
-  document.getElementById('joinedCount').textContent = joinedCases.length;
+  // Joined tab count reflects active (non-archived) chats only.
+  document.getElementById('joinedCount').textContent = joinedActive.length;
   document.getElementById('discoverCount').textContent = discoverCases.length;
 
-  const viewPool = view === 'joined' ? joinedCases : discoverCases;
-  renderStatusFilter(viewPool);
+  let viewPool;
+  if (view === 'joined')        viewPool = joinedActive;
+  else if (view === 'archived') viewPool = joinedArchived;
+  else                          viewPool = discoverCases;
+
+  renderChatToolbar(viewPool, view, joinedArchived.length);
 
   const statusFiltered = STATE.statusFilter && STATE.statusFilter !== 'all'
     ? viewPool.filter(c => c.status === STATE.statusFilter)
@@ -28,36 +35,114 @@ function renderChats() {
   document.getElementById('whitelistBtn').style.display = isAdmin ? 'flex' : 'none';
 }
 
-// ---------- Status filter pills ----------
+// ---------- Compact chat toolbar (status dropdown + archive icon) ----------
 
-function renderStatusFilter(viewPool) {
-  const wrap = document.getElementById('statusFilter');
+function renderChatToolbar(viewPool, view, archivedCount) {
+  const wrap = document.getElementById('chatToolbar');
   if (!wrap) return;
+
+  if (view === 'archived') {
+    wrap.innerHTML = renderArchivedToolbar(archivedCount);
+    return;
+  }
+
   const counts = { all: viewPool.length };
   STATUS_ORDER.forEach(k => { counts[k] = viewPool.filter(c => c.status === k).length; });
 
-  const allActive = STATE.statusFilter === 'all' ? 'active' : '';
-  const allPill = `<button class="status-filter-pill ${allActive}" onclick="setStatusFilter('all')">All · ${counts.all}</button>`;
+  const filterTrigger = renderStatusFilterTrigger(counts);
+  const filterMenu    = renderStatusFilterMenu(counts);
+  const archiveBtn    = (view === 'joined' && archivedCount > 0)
+    ? renderArchiveIconBtn(archivedCount)
+    : '';
 
-  const statusPills = STATUS_ORDER.map(k => {
-    const meta = STATUS_META[k];
-    const active = STATE.statusFilter === k;
-    const activeStyle = active
-      ? `background:${meta.bg}; color:${meta.color}; border-color:${meta.dot};`
-      : '';
-    return `<button class="status-filter-pill ${active ? 'active' : ''}" style="${activeStyle}" onclick="setStatusFilter('${k}')" title="${meta.label}">
-      <span class="dot" style="background:${meta.dot};"></span>${meta.short} · ${counts[k]}
+  wrap.innerHTML = `
+    <div class="toolbar-filter-wrap">
+      ${filterTrigger}
+      ${filterMenu}
+    </div>
+    ${archiveBtn}
+  `;
+}
+
+function renderStatusFilterTrigger(counts) {
+  const key = STATE.statusFilter || 'all';
+  if (key === 'all') {
+    return `<button class="toolbar-filter-btn" onclick="event.stopPropagation(); toggleFilterMenu();">
+      All · ${counts.all} <span class="caret">▾</span>
     </button>`;
-  }).join('');
+  }
+  const meta = STATUS_META[key];
+  return `<button class="toolbar-filter-btn active" onclick="event.stopPropagation(); toggleFilterMenu();"
+                  style="background:${meta.bg}; color:${meta.color};" title="${meta.label}">
+    <span class="dot" style="background:${meta.dot};"></span>${meta.short} · ${counts[key]} <span class="caret">▾</span>
+  </button>`;
+}
 
-  wrap.innerHTML = allPill + statusPills;
+function renderStatusFilterMenu(counts) {
+  const items = [
+    { key: 'all', label: 'All', dot: null, count: counts.all },
+    ...STATUS_ORDER.map(k => ({
+      key: k, label: STATUS_META[k].short, dot: STATUS_META[k].dot, count: counts[k]
+    }))
+  ];
+  return `
+    <div class="toolbar-filter-menu" id="toolbarFilterMenu">
+      ${items.map(it => {
+        const isActive = (STATE.statusFilter || 'all') === it.key;
+        const dotHtml = it.dot ? `<span class="dot" style="background:${it.dot};"></span>` : '<span class="dot dot-empty"></span>';
+        return `<button class="${isActive ? 'current' : ''}" onclick="setStatusFilter('${it.key}')">
+          ${dotHtml}<span class="label">${it.label}</span><span class="count">${it.count}</span>
+        </button>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderArchiveIconBtn(count) {
+  return `
+    <button class="toolbar-archive-btn" onclick="switchView('archived')" title="View archived chats (${count})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>
+      </svg>
+      <span class="toolbar-archive-badge">${count}</span>
+    </button>
+  `;
+}
+
+function renderArchivedToolbar(count) {
+  return `
+    <button class="toolbar-back-btn" onclick="switchView('joined')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Joined
+    </button>
+    <div class="toolbar-archived-label">Archived · ${count}</div>
+  `;
 }
 
 function setStatusFilter(key) {
   STATE.statusFilter = key;
   STATE.currentPage = 1;
+  hideFilterMenu();
   renderChats();
 }
+
+function toggleFilterMenu() {
+  document.getElementById('toolbarFilterMenu')?.classList.toggle('show');
+}
+
+function hideFilterMenu() {
+  document.getElementById('toolbarFilterMenu')?.classList.remove('show');
+}
+
+// Click anywhere outside the dropdown closes it.
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('toolbarFilterMenu');
+  if (menu && menu.classList.contains('show') && !e.target.closest('.toolbar-filter-wrap')) {
+    menu.classList.remove('show');
+  }
+});
 
 // Pinned cases float to the top; relative order within each group is preserved.
 function sortJoined(cases) {
@@ -95,6 +180,8 @@ function emptyChatListHtml(view, search, isAdmin) {
   let body;
   if (search) {
     body = `No cases found for "${search}".`;
+  } else if (view === 'archived') {
+    body = 'No archived chats.';
   } else if (view === 'joined') {
     body = isAdmin
       ? `You haven't joined any cases yet.<br><br>Switch to <b>Discover</b> to find cases.`
@@ -114,6 +201,16 @@ function emptyChatListHtml(view, search, isAdmin) {
 
 function renderPaginationFooter(total) {
   const totalPages = Math.max(1, Math.ceil(total / STATE.casesPerPage));
+
+  // Hide the pagination row entirely when there's only one page —
+  // a "1–6 of 6" with no next page is pure noise.
+  const wrap = document.getElementById('chatPagination');
+  if (totalPages <= 1) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'flex';
+
   const start = (STATE.currentPage - 1) * STATE.casesPerPage;
   document.getElementById('pageInfo').textContent =
     `${total === 0 ? 0 : start + 1}–${Math.min(start + STATE.casesPerPage, total)} of ${total}`;

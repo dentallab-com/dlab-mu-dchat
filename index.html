@@ -148,7 +148,7 @@
       </button>
     </div>
 
-    <div class="status-filter" id="statusFilter"></div>
+    <div class="chat-toolbar" id="chatToolbar"></div>
 
     <div class="chat-list" id="chatList"></div>
 
@@ -206,6 +206,11 @@
           <button class="icon-btn" id="muteBtn" onclick="toggleMute()" title="Mute notifications">
             <svg class="icon" id="muteIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </button>
+          <button class="icon-btn" id="archiveBtn" onclick="toggleArchive()" title="Archive chat">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>
             </svg>
           </button>
           <button class="icon-btn" onclick="toggleInfoPanel()" title="Group info">

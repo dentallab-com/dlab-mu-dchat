@@ -25,21 +25,27 @@ function openChat(id) {
   document.getElementById('app').classList.add('chat-open');
 }
 
-// ---------- Pin / mute ----------
+// ---------- Pin / mute / archive ----------
 
 function updatePinMuteButtons() {
   const c = STATE.activeChat;
   if (!c) return;
-  const pinBtn = document.getElementById('pinBtn');
-  const muteBtn = document.getElementById('muteBtn');
+  const pinBtn     = document.getElementById('pinBtn');
+  const muteBtn    = document.getElementById('muteBtn');
+  const archiveBtn = document.getElementById('archiveBtn');
+
   pinBtn.classList.toggle('active', !!c.pinned);
   pinBtn.title = c.pinned ? 'Unpin chat' : 'Pin chat';
+
   muteBtn.classList.toggle('active', !!c.muted);
   muteBtn.title = c.muted ? 'Unmute notifications' : 'Mute notifications';
   // Swap mute icon between bell and bell-off
   document.getElementById('muteIcon').innerHTML = c.muted
     ? '<path d="M13.73 21a2 2 0 0 1-3.46 0M18.63 13A17 17 0 0 1 18 8M6.26 6.26A6 6 0 0 0 6 8c0 7-3 9-3 9h14M18 8a6 6 0 0 0-9.33-5M1 1l22 22"/>'
     : '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>';
+
+  archiveBtn.classList.toggle('active', !!c.archived);
+  archiveBtn.title = c.archived ? 'Unarchive chat' : 'Archive chat';
 }
 
 function togglePin() {
@@ -64,6 +70,27 @@ function toggleMute() {
   showToast(
     c.muted ? 'Muted' : 'Unmuted',
     c.muted ? `You won't get push alerts for #${c.id}.` : `Notifications resumed for #${c.id}.`,
+    'success'
+  );
+}
+
+function toggleArchive() {
+  const c = STATE.activeChat;
+  if (!c) return;
+  c.archived = !c.archived;
+  updatePinMuteButtons();
+
+  // If we just unarchived the last archived chat from the archived sub-view,
+  // bounce back to Joined so the user isn't stranded on an empty list.
+  if (STATE.view === 'archived' && !c.archived) {
+    const stillArchived = STATE.cases.some(x => isMember(x) && x.archived);
+    if (!stillArchived) STATE.view = 'joined';
+  }
+
+  renderChats();
+  showToast(
+    c.archived ? 'Archived' : 'Unarchived',
+    c.archived ? `#${c.id} moved to Archived.` : `#${c.id} restored to chat list.`,
     'success'
   );
 }

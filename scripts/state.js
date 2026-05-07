@@ -280,16 +280,18 @@ const STATUS_DEFAULTS = {
   '5676755': 'approval',
   '5676623': 'production'
 };
-const UNREAD_SEED = { '5678412': 2, '5677321': 1, '5677845': 3 };
-const PIN_SEED    = { '5678656': true, '5678412': true };
-const MUTE_SEED   = { '5677654': true };
+const UNREAD_SEED   = { '5678412': 2, '5677321': 1, '5677845': 3 };
+const PIN_SEED      = { '5678656': true, '5678412': true };
+const MUTE_SEED     = { '5677654': true };
+const ARCHIVE_SEED  = { '5677088': true, '5676912': true };
 
-// Apply default status + unread + pin/mute to seeded cases
+// Apply default status + unread + pin/mute/archive to seeded cases
 STATE.cases.forEach(c => {
-  if (!c.status)               c.status = STATUS_DEFAULTS[c.id] || 'production';
-  if (c.unread === undefined)  c.unread = UNREAD_SEED[c.id] || 0;
-  if (c.pinned === undefined)  c.pinned = !!PIN_SEED[c.id];
-  if (c.muted  === undefined)  c.muted  = !!MUTE_SEED[c.id];
+  if (!c.status)                c.status   = STATUS_DEFAULTS[c.id] || 'production';
+  if (c.unread   === undefined) c.unread   = UNREAD_SEED[c.id] || 0;
+  if (c.pinned   === undefined) c.pinned   = !!PIN_SEED[c.id];
+  if (c.muted    === undefined) c.muted    = !!MUTE_SEED[c.id];
+  if (c.archived === undefined) c.archived = !!ARCHIVE_SEED[c.id];
 });
 
 // ===================================================================

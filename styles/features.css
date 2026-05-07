@@ -11,6 +11,7 @@
     9. Mute toggle per chat
    10. Filter chats by status
    11. Online / Offline / Last Seen presence
+   12. Archive chats (WhatsApp-style)
    =================================================================== */
 
 /* ============ 1. UNREAD BADGE ============ */
@@ -394,42 +395,162 @@ button.status-pill::after {
   text-align: center;
 }
 
-/* ============ 10. STATUS FILTER PILLS ============ */
-.status-filter {
+/* ============ 10. CHAT TOOLBAR (status dropdown + archive icon) ============ */
+.chat-toolbar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
+  min-height: 44px;
 }
 
-.status-filter-pill {
+.toolbar-filter-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.toolbar-filter-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 9px;
+  gap: 6px;
+  padding: 6px 12px;
   border-radius: 14px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-soft);
   background: var(--surface-2);
   border: 1px solid transparent;
   white-space: nowrap;
-  flex-shrink: 0;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s;
   line-height: 1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.status-filter-pill:hover {
-  background: var(--border);
-  color: var(--text);
-}
-.status-filter-pill.active {
-  color: var(--text);
-}
-.status-filter-pill .dot {
-  width: 6px; height: 6px;
+.toolbar-filter-btn:hover { background: var(--border); color: var(--text); }
+.toolbar-filter-btn.active { color: var(--text); }
+.toolbar-filter-btn .dot {
+  width: 7px; height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+.toolbar-filter-btn .caret {
+  font-size: 9px;
+  opacity: 0.7;
+  margin-left: 2px;
+}
+
+.toolbar-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  padding: 4px;
+  z-index: 240;
+  min-width: 220px;
+  display: none;
+  animation: msgIn 0.15s ease;
+}
+.toolbar-filter-menu.show { display: block; }
+.toolbar-filter-menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--text);
+  transition: background 0.15s;
+}
+.toolbar-filter-menu button:hover  { background: var(--surface-2); }
+.toolbar-filter-menu button.current { background: var(--surface-2); }
+.toolbar-filter-menu button.current::after {
+  content: "✓";
+  margin-left: auto;
+  color: var(--green);
+  font-weight: 700;
+}
+.toolbar-filter-menu .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.toolbar-filter-menu .dot-empty {
+  background: transparent;
+  border: 1.5px solid var(--border);
+}
+.toolbar-filter-menu .label { flex: 1; }
+.toolbar-filter-menu .count {
+  font-size: 11px;
+  color: var(--text-mute);
+  font-weight: 500;
+  margin-left: auto;
+}
+.toolbar-filter-menu button.current .count { color: var(--text-soft); }
+
+/* Archive icon (compact, with count badge) */
+.toolbar-archive-btn {
+  position: relative;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  background: var(--surface-2);
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.toolbar-archive-btn:hover { background: var(--border); color: var(--text); }
+.toolbar-archive-btn svg { width: 16px; height: 16px; }
+.toolbar-archive-badge {
+  position: absolute;
+  top: -4px; right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--red);
+  color: white;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--surface);
+  line-height: 1;
+}
+
+/* Toolbar in archived view: back button + label */
+.toolbar-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  transition: background 0.15s;
+}
+.toolbar-back-btn:hover { background: var(--border); }
+.toolbar-back-btn svg { width: 14px; height: 14px; }
+.toolbar-archived-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ============ 11. PRESENCE DOT ============ */
@@ -495,6 +616,14 @@ button.status-pill::after {
 
 /* Mute button in chat header — red when muted (matches pinBtn pattern) */
 #muteBtn.active { color: var(--red); }
+
+/* ============ 12. ARCHIVE ============ */
+/* Archive entry/exit live in the chat-toolbar (section 10).
+   This section only styles the per-chat archive button in the chat header. */
+
+/* Archive button in the chat header — red when chat is archived
+   (matches the pin/mute active pattern). */
+#archiveBtn.active { color: var(--red); }
 
 /* ============ 7. MEMBER REMOVE (KICK) ============ */
 .member { position: relative; }
