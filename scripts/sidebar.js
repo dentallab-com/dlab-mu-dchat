@@ -7,7 +7,10 @@
 function renderChats() {
   const search = document.getElementById('searchInput').value.trim();
   const isAdmin = STATE.currentUser.isAdmin;
-  const view = isAdmin ? STATE.view : 'joined';
+  // Non-admins can use Joined + Archived but never Discover (the tab is
+  // hidden for them in applyAdminVisibility). If STATE.view somehow lands
+  // on 'discover' for a non-admin, fall back to 'joined'.
+  const view = (!isAdmin && STATE.view === 'discover') ? 'joined' : STATE.view;
 
   const allJoined      = sortJoined(STATE.cases.filter(isMember));
   const joinedActive   = allJoined.filter(c => !c.archived);
