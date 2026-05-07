@@ -136,8 +136,42 @@ function revealApp(animate) {
 
 function logout() {
   try { localStorage.removeItem('dchat:user'); } catch (_) {}
+
+  // Wipe in-memory session before showing the login screen so the next
+  // login (same or different user) starts from a pristine state.
+  resetSessionState();
+  resetSessionDom();
+}
+
+// Resets every piece of in-memory state owned by the app: STATE itself,
+// the seeded cases / whitelist, and the per-feature transient variables
+// (composer files, reply target, mention popup, modal autocomplete).
+function resetSessionState() {
+  // STATE — back to defaults
+  STATE.currentUser         = { ...INITIAL_CURRENT_USER };
+  STATE.cases               = freshCases();
+  STATE.whitelist           = JSON.parse(JSON.stringify(INITIAL_WHITELIST));
+  STATE.activeChat          = null;
+  STATE.pendingEmails       = [];
+  STATE.theme               = 'light';
+  STATE.view                = 'joined';
+  STATE.statusFilter        = 'all';
+  STATE.currentPage         = 1;
   STATE.notificationsEnabled = false;
-  document.getElementById('notifBtn').classList.remove('active');
+
+  // Per-feature transient state (defined as `let` in their owning files).
+  PENDING_FILES        = [];
+  REPLY_TO             = null;
+  INVITE_EMAILS        = [];
+  AC_ACTIVE_INDEX      = -1;
+  PENDING_LOGIN_EMAIL  = null;
+  hideMentionAutocomplete();
+}
+
+// Restores the DOM bits that don't get rewritten by the next render cycle:
+// input fields, theme attribute, open modals, and the login screen itself.
+function resetSessionDom() {
+  // Login screen back to step 1
   document.getElementById('app').style.display = 'none';
   const login = document.getElementById('loginScreen');
   login.style.display = '';
@@ -145,6 +179,22 @@ function logout() {
   document.getElementById('loginStep1').style.display = 'block';
   document.getElementById('loginStep2').style.display = 'none';
   document.querySelectorAll('.otp-input').forEach(i => i.value = '');
+
+  // Inputs the browser would otherwise persist
+  document.getElementById('composerInput').value = '';
+  document.getElementById('searchInput').value   = '';
+
+  // Theme back to light
+  document.documentElement.removeAttribute('data-theme');
+  document.getElementById('themeIcon').innerHTML =
+    '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>';
+
+  // UI bits that aren't touched by render
+  document.getElementById('notifBtn').classList.remove('active');
+  document.getElementById('replyPreviewWrap').innerHTML = '';
+  document.getElementById('filePreviewWrap').innerHTML  = '';
+  document.getElementById('toastContainer').innerHTML   = '';
+  document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
 }
 
 // ---------- OTP input behavior (auto-advance, backspace, paste) ----------

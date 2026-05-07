@@ -3,28 +3,34 @@
 // Single source of truth for the demo. All other modules read/write through STATE.
 // =============================================================================
 
+// Pristine seed values — kept untouched so we can rebuild a fresh STATE
+// on logout (resetSessionState() in auth.js consumes these).
+const INITIAL_CURRENT_USER = {
+  name: 'Faisal Ahmed',
+  email: 'faisal.ahmed@dentallab.com',
+  role: 'Lab Manager',
+  department: 'Production',
+  isAdmin: true,
+  avatar: 'FA',
+  color: '#DF2926'
+};
+
+const INITIAL_WHITELIST = [
+  { email: 'r.patel@brightsmile.com', addedBy: 'Faisal Ahmed', addedAt: 'Apr 28' },
+  { email: 'h.brennan@familycare.com', addedBy: 'Faisal Ahmed', addedAt: 'Apr 22' }
+];
+
 const STATE = {
-  currentUser: {
-    name: 'Faisal Ahmed',
-    email: 'faisal.ahmed@dentallab.com',
-    role: 'Lab Manager',
-    department: 'Production',
-    isAdmin: true,
-    avatar: 'FA',
-    color: '#DF2926'
-  },
+  currentUser: { ...INITIAL_CURRENT_USER },
   cases: [],
   activeChat: null,
   pendingEmails: [],
   theme: 'light',
-  view: 'joined',           // 'joined' | 'discover'
+  view: 'joined',           // 'joined' | 'discover' | 'archived'
   statusFilter: 'all',      // 'all' | one of STATUS_ORDER keys
   currentPage: 1,
   casesPerPage: 10,
-  whitelist: [
-    { email: 'r.patel@brightsmile.com', addedBy: 'Faisal Ahmed', addedAt: 'Apr 28' },
-    { email: 'h.brennan@familycare.com', addedBy: 'Faisal Ahmed', addedAt: 'Apr 22' }
-  ],
+  whitelist: JSON.parse(JSON.stringify(INITIAL_WHITELIST)),
   notificationsEnabled: false
 };
 
@@ -251,7 +257,8 @@ const MOCK_CASES = [
   }
 ];
 
-STATE.cases = MOCK_CASES;
+// STATE.cases is populated via freshCases() further down,
+// after STATUS_DEFAULTS / *_SEED maps are declared.
 
 // ===================================================================
 // CASE STATUS CONFIG
@@ -285,14 +292,22 @@ const PIN_SEED      = { '5678656': true, '5678412': true };
 const MUTE_SEED     = { '5677654': true };
 const ARCHIVE_SEED  = { '5677088': true, '5676912': true };
 
-// Apply default status + unread + pin/mute/archive to seeded cases
-STATE.cases.forEach(c => {
-  if (!c.status)                c.status   = STATUS_DEFAULTS[c.id] || 'production';
-  if (c.unread   === undefined) c.unread   = UNREAD_SEED[c.id] || 0;
-  if (c.pinned   === undefined) c.pinned   = !!PIN_SEED[c.id];
-  if (c.muted    === undefined) c.muted    = !!MUTE_SEED[c.id];
-  if (c.archived === undefined) c.archived = !!ARCHIVE_SEED[c.id];
-});
+// Build a fresh, deep-cloned cases array with all per-case defaults applied.
+// Called at boot, and again from resetSessionState() on logout so the next
+// login starts with a pristine list (no leftover archives / pins / unread).
+function freshCases() {
+  const cases = JSON.parse(JSON.stringify(MOCK_CASES));
+  cases.forEach(c => {
+    if (!c.status)                c.status   = STATUS_DEFAULTS[c.id] || 'production';
+    if (c.unread   === undefined) c.unread   = UNREAD_SEED[c.id] || 0;
+    if (c.pinned   === undefined) c.pinned   = !!PIN_SEED[c.id];
+    if (c.muted    === undefined) c.muted    = !!MUTE_SEED[c.id];
+    if (c.archived === undefined) c.archived = !!ARCHIVE_SEED[c.id];
+  });
+  return cases;
+}
+
+STATE.cases = freshCases();
 
 // ===================================================================
 // STATUS RENDER HELPERS
