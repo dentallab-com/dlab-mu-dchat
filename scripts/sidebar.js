@@ -269,6 +269,7 @@ function renderJoinedItem(c) {
   const time = lastMsg ? lastMsg.time : c.createdAt;
   const active = STATE.activeChat?.id === c.id ? 'active' : '';
   const unread = c.unread || 0;
+  const mentionBadge = hasUnreadMentionForMe(c) ? '<span class="chat-item-mention" title="You were mentioned">@</span>' : '';
   const unreadBadge = unread > 0
     ? `<span class="chat-item-unread${c.muted ? ' muted' : ''}">${unread > 99 ? '99+' : unread}</span>`
     : '';
@@ -286,12 +287,28 @@ function renderJoinedItem(c) {
           <span class="chat-item-preview">${preview}</span>
           <div class="chat-item-meta-right">
             ${statusPill(c.status, { sm: true })}
+            ${mentionBadge}
             ${unreadBadge}
           </div>
         </div>
       </div>
     </div>
   `;
+}
+
+// True iff the current user is @mentioned in any unread tail message OR if
+// any unread tail message is a reply to a message the user sent.
+function hasUnreadMentionForMe(c) {
+  const me = STATE.currentUser;
+  if (!me) return false;
+  const unread = c.unread || 0;
+  if (unread <= 0) return false;
+  const tag = '@' + me.name;
+  const tail = c.messages.filter(m => m.type === 'msg').slice(-unread);
+  return tail.some(m =>
+    (typeof m.text === 'string' && m.text.includes(tag)) ||
+    (m.replyTo && m.replyTo.sender === me.name)
+  );
 }
 
 function pinIconSvg() {
@@ -385,6 +402,7 @@ function requestJoin(id) {
     requestedAt: 'Just now'
   });
   showToast('Request sent', `Admin will review your request to join #${id}.`, 'success');
+  updateRequestsBadge();
   renderChats();
 }
 
@@ -404,10 +422,13 @@ function approveRequest(caseId, email) {
   c.joinRequests = c.joinRequests.filter(r => r.email !== email);
   c.messages.push({ type: 'system', text: STATE.currentUser.name + ' approved ' + req.name + ' to join' });
   showToast('Approved', `${req.name} added to #${c.id}.`, 'success');
+  updateRequestsBadge();
   renderInfoPanel();
-  renderMessages();
+  if (STATE.activeChat?.id === c.id) {
+    renderMessages();
+    document.getElementById('chatHeaderMeta').textContent = `${c.members.length} members · ${c.doctor || 'No doctor assigned'}`;
+  }
   renderChats();
-  document.getElementById('chatHeaderMeta').textContent = `${c.members.length} members · ${c.doctor || 'No doctor assigned'}`;
 }
 
 function rejectRequest(caseId, email) {
@@ -415,6 +436,7 @@ function rejectRequest(caseId, email) {
   if (!c) return;
   c.joinRequests = (c.joinRequests || []).filter(r => r.email !== email);
   showToast('Rejected', 'Join request rejected.', 'success');
+  updateRequestsBadge();
   renderInfoPanel();
   renderChats();
 }

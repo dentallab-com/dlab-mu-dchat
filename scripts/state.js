@@ -87,10 +87,16 @@ const MOCK_CASES = [
       { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false },
       { name: 'Aisha Khan', email: 'aisha.khan@dentallab.com', role: 'Technician', avatar: 'AK', isAdmin: false, isExternal: false }
     ],
+    joinRequests: [
+      { name: 'Sarah Khan', email: 'sarah.khan@dentallab.com', avatar: 'SK', requestedAt: '30m ago' }
+    ],
     messages: [
       { type: 'system', text: 'Faisal Ahmed created this case' },
       { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Shade match looks tricky on this one. Patient has very translucent enamel.', time: 'Yesterday', own: false },
-      { type: 'msg', sender: 'Faisal Ahmed', avatar: 'FA', text: "Let's do A1 with B1 incisal layering. Check the photos again.", time: 'Yesterday', own: true }
+      { type: 'msg', sender: 'Faisal Ahmed', avatar: 'FA', text: "Let's do A1 with B1 incisal layering. Check the photos again.", time: 'Yesterday', own: true },
+      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Got it. But the patient asked for slightly more translucency at the edge. @Faisal Ahmed any preference, or should I just match the contralateral?', time: '08:42', own: false,
+        replyTo: { idx: 2, sender: 'Faisal Ahmed', text: "Let's do A1 with B1 incisal layering. Check the photos again." } },
+      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Also @Faisal Ahmed — Dr. Hassan asked when we can deliver. Friday OK?', time: '08:45', own: false }
     ]
   },
   {
@@ -138,7 +144,9 @@ const MOCK_CASES = [
     ],
     messages: [
       { type: 'system', text: 'Faisal Ahmed created this case' },
-      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Wax-up done. Sending photos for approval.', time: 'Apr 20', own: false }
+      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Wax-up done. Sending photos for approval.', time: 'Apr 20', own: false },
+      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: '@Faisal Ahmed wax-up photos uploaded — need your approval before I move to layering.', time: '07:55', own: false, file: { name: 'veneer_waxup_set.jpg', size: '5.2 MB', icon: 'image' } },
+      { type: 'msg', sender: 'Aisha Khan', avatar: 'AK', text: 'Patient is in tomorrow at 11. @Faisal Ahmed if we can get sign-off today we are golden.', time: '08:10', own: false }
     ]
   },
   {
@@ -236,6 +244,9 @@ const MOCK_CASES = [
     members: [
       { name: 'Faisal Ahmed', email: 'faisal.ahmed@dentallab.com', role: 'Lab Manager', avatar: 'FA', isAdmin: true, isExternal: false },
       { name: 'Tom Wright', email: 'tom.wright@dentallab.com', role: 'Technician', avatar: 'TW', isAdmin: false, isExternal: false }
+    ],
+    joinRequests: [
+      { name: 'Lisa Park', email: 'lisa.park@dentallab.com', avatar: 'LP', requestedAt: '4h ago' }
     ],
     messages: [
       { type: 'system', text: 'Faisal Ahmed created this case' },
