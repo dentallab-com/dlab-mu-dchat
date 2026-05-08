@@ -100,8 +100,10 @@ function updateUserChip(user) {
 function applyAdminVisibility(isAdmin) {
   document.getElementById('newCaseBtn').style.display   = isAdmin ? 'flex' : 'none';
   document.getElementById('whitelistBtn').style.display = isAdmin ? 'flex' : 'none';
+  document.getElementById('requestsBtn').style.display  = isAdmin ? 'flex' : 'none';
   document.getElementById('discoverTab').style.display  = isAdmin ? '' : 'none';
   if (!isAdmin) STATE.view = 'joined';
+  updateRequestsBadge();
 }
 
 function persistSession(email) {
@@ -121,6 +123,7 @@ function revealApp(animate) {
     document.getElementById('emptyState').style.display = 'flex';
     document.getElementById('app').classList.remove('with-info', 'chat-open');
     renderChats();
+    setTimeout(showLoginNotifications, 600);
   };
 
   if (animate) {
@@ -130,6 +133,57 @@ function revealApp(animate) {
     document.getElementById('loginScreen').style.display = 'none';
     showApp();
   }
+}
+
+// Surfaces pending items as toasts right after login so the user lands with
+// a sense of what's waiting on them. Two streams:
+//   - admin: pending join requests across all cases
+//   - everyone: @mentions + replies on their messages, in chats with unread > 0
+function showLoginNotifications() {
+  const me = STATE.currentUser;
+  if (!me) return;
+
+  if (me.isAdmin) {
+    const pending = (typeof getAllPendingRequests === 'function') ? getAllPendingRequests() : [];
+    if (pending.length) {
+      showToast(
+        `${pending.length} pending join request${pending.length === 1 ? '' : 's'}`,
+        'Open the request center in the sidebar to approve or reject.',
+        'success'
+      );
+    }
+  }
+
+  const summary = collectMentionSummary(me);
+  if (summary.mentions > 0 || summary.replies > 0) {
+    const parts = [];
+    if (summary.mentions) parts.push(`${summary.mentions} new @mention${summary.mentions === 1 ? '' : 's'}`);
+    if (summary.replies)  parts.push(`${summary.replies} repl${summary.replies === 1 ? 'y' : 'ies'} on your messages`);
+    showToast(
+      'You have unread activity',
+      parts.join(' · ') + '.',
+      'success'
+    );
+  }
+}
+
+// Walks the unread tail of each joined case and counts @mentions of the
+// current user and replies to messages they sent. Only the last `unread`
+// messages of each case are considered "new", matching the unread badge.
+function collectMentionSummary(me) {
+  const tag = '@' + me.name;
+  let mentions = 0, replies = 0;
+  STATE.cases.forEach(c => {
+    if (!c.members.some(m => m.email === me.email)) return;
+    const unread = c.unread || 0;
+    if (unread <= 0) return;
+    const tail = c.messages.filter(m => m.type === 'msg').slice(-unread);
+    tail.forEach(m => {
+      if (typeof m.text === 'string' && m.text.includes(tag)) mentions++;
+      if (m.replyTo && m.replyTo.sender === me.name)          replies++;
+    });
+  });
+  return { mentions, replies };
 }
 
 // ---------- Logout ----------

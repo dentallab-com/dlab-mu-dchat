@@ -250,6 +250,60 @@
   justify-content: flex-end;
 }
 
+/* Badged icon button — used by the join-requests center button. */
+.icon-btn-badged { position: relative; }
+.badge-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  border-radius: 999px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--surface);
+  pointer-events: none;
+}
+.badge-dot[hidden] { display: none; }
+
+/* Per-case grouping inside the requests modal. */
+.request-group { margin-bottom: 18px; }
+.request-group:last-child { margin-bottom: 0; }
+.request-group-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.request-group-id { color: var(--text); }
+.request-group-title { color: var(--text-mute); font-weight: 500; margin-left: 4px; }
+.muted-count { color: var(--text-mute); font-weight: 500; font-size: 14px; margin-left: 6px; }
+
+/* Mention indicator on chat list rows — appears when current user is
+   @mentioned in any unread message of the case. */
+.chat-item-mention {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--red-soft);
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  margin-right: 4px;
+}
+
 /* ============ JOIN REQUESTS ============ */
 .request-row {
   display: flex;
@@ -271,10 +325,19 @@
   font-weight: 600;
   transition: opacity 0.15s, transform 0.1s;
 }
-.req-btn.approve { background: var(--green); color: white; }
-.req-btn.reject { background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); }
-.req-btn:hover { opacity: 0.85; }
-.req-btn:active { transform: scale(0.95); }
+.req-btn.approve {
+  background: var(--red);
+  color: white;
+  box-shadow: 0 2px 6px rgba(223, 41, 38, 0.25);
+}
+.req-btn.approve:hover { background: var(--red-dark); }
+.req-btn.reject {
+  background: var(--surface);
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+}
+.req-btn.reject:hover { background: var(--surface-2); border-color: var(--text-mute); }
+.req-btn:active { transform: scale(0.96); }
 
 /* ============ DISCOVER ACTION ============ */
 .discover-action {

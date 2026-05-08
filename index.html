@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Lab Case Chat — Demo</title>
+<link rel="icon" type="image/png" href="assets/favicon-light.png" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="assets/favicon-dark.png" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="assets/favicon-light.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -27,10 +30,12 @@
   <div class="login-bg"></div>
   <div class="login-card">
     <div class="brand">
-      <div class="brand-logo">DL</div>
+      <div class="brand-icon-wrap">
+        <img class="brand-icon" src="assets/favicon-light.png" alt="">
+      </div>
       <div class="brand-text">
-        Dental Lab Case Chat
-        <small>Internal Tool · v1.0</small>
+        <div class="brand-title">Dental Lab Case Chat</div>
+        <div class="brand-sub">Internal Tool · v1.0</div>
       </div>
     </div>
 
@@ -159,6 +164,14 @@
         <button class="page-btn" id="nextPage" onclick="changePage(1)">›</button>
       </div>
       <div class="sidebar-tools">
+        <button class="icon-btn icon-btn-badged" onclick="openRequestsModal()" title="Join Requests (Admin)" id="requestsBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 11h-6M19 8v6"/>
+          </svg>
+          <span class="badge-dot" id="requestsBadge" hidden>0</span>
+        </button>
         <button class="icon-btn" onclick="openWhitelistModal()" title="Manage Whitelist (Admin)" id="whitelistBtn">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 12l2 2 4-4M21 12c0 5-3.5 8-9 9-5.5-1-9-4-9-9V5l9-3 9 3z"/>
@@ -412,6 +425,24 @@
   </div>
 </div>
 
+<!-- ============ JOIN REQUESTS MODAL ============ -->
+<div class="modal-overlay" id="requestsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Join Requests <span id="requestsModalCount" class="muted-count"></span></h2>
+      <button class="icon-btn" onclick="closeModal('requestsModal')">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="requestsModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('requestsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ MENTION AUTOCOMPLETE ============ -->
 <div class="mention-autocomplete" id="mentionAutocomplete"></div>
 
@@ -438,6 +469,7 @@
 <script src="scripts/mention.js"></script>
 <script src="scripts/info-panel.js"></script>
 <script src="scripts/modals.js"></script>
+<script src="scripts/requests-center.js"></script>
 <script src="scripts/notifications.js"></script>
 <script src="scripts/main.js"></script>
 </body>
