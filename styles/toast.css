@@ -1,12 +1,17 @@
 .toast-container {
   position: fixed;
-  top: 20px;
+  /* Sit below the chat header's icon row so toasts never overlap mute/info/
+     other action icons — users were getting blocked from re-clicking them. */
+  top: 80px;
   right: 20px;
   z-index: 300;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  pointer-events: none;
 }
+
+.toast-container > * { pointer-events: auto; }
 
 .toast {
   background: var(--surface);

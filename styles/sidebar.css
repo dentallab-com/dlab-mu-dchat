@@ -205,42 +205,16 @@
   color: white;
 }
 
-/* ============ FOOTER + PAGINATION ============ */
+/* ============ FOOTER ============ */
 .sidebar-footer {
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
 
-.chat-pagination {
-  padding: 8px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text-soft);
-  border-bottom: 1px solid var(--border);
-}
-
-.page-btn {
-  width: 28px; height: 28px;
-  border-radius: 6px;
-  color: var(--text-soft);
-  background: var(--surface-2);
-  font-size: 14px;
-  font-weight: 600;
-  transition: background 0.15s, color 0.15s, opacity 0.15s;
-}
-
-.page-btn:hover:not(:disabled) {
-  background: var(--red);
-  color: white;
-}
-
-.page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+/* Invisible sentinel that the IntersectionObserver watches to load more chats. */
+.chat-list-sentinel {
+  height: 1px;
 }
 
 .sidebar-tools {

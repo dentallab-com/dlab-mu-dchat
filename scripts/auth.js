@@ -114,7 +114,7 @@ function revealApp(animate) {
   const showApp = () => {
     document.getElementById('app').style.display = 'grid';
     STATE.view = 'joined';
-    STATE.currentPage = 1;
+    resetChatScroll();
     document.querySelectorAll('.view-tab').forEach(t => {
       t.classList.toggle('active', t.dataset.view === 'joined');
     });
@@ -212,7 +212,7 @@ function resetSessionState() {
   STATE.theme               = 'light';
   STATE.view                = 'joined';
   STATE.statusFilter        = 'all';
-  STATE.currentPage         = 1;
+  STATE.visibleChats        = STATE.chatBatchSize;
   STATE.notificationsEnabled = false;
 
   // Per-feature transient state (defined as `let` in their owning files).
