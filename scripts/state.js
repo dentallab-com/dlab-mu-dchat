@@ -28,8 +28,8 @@ const STATE = {
   theme: 'light',
   view: 'joined',           // 'joined' | 'discover' | 'archived'
   statusFilter: 'all',      // 'all' | one of STATUS_ORDER keys
-  currentPage: 1,
-  casesPerPage: 10,
+  visibleChats: 20,         // infinite scroll: how many list items are currently rendered
+  chatBatchSize: 20,        // how many more to reveal each time the sentinel scrolls into view
   whitelist: JSON.parse(JSON.stringify(INITIAL_WHITELIST)),
   notificationsEnabled: false
 };

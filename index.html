@@ -133,7 +133,7 @@
         <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>
         </svg>
-        <input type="text" class="search-input" placeholder="Search by Case ID..." id="searchInput" oninput="STATE.currentPage = 1; renderChats();">
+        <input type="text" class="search-input" placeholder="Search by Case ID..." id="searchInput" oninput="resetChatScroll(); renderChats();">
       </div>
       <button class="new-case-btn" id="newCaseBtn" onclick="openNewCaseModal()" title="New Case (Admin only)">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -158,11 +158,6 @@
     <div class="chat-list" id="chatList"></div>
 
     <div class="sidebar-footer">
-      <div class="chat-pagination" id="chatPagination">
-        <button class="page-btn" id="prevPage" onclick="changePage(-1)">‹</button>
-        <span id="pageInfo">Page 1</span>
-        <button class="page-btn" id="nextPage" onclick="changePage(1)">›</button>
-      </div>
       <div class="sidebar-tools">
         <button class="icon-btn icon-btn-badged" onclick="openRequestsModal()" title="Join Requests (Admin)" id="requestsBtn">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -439,6 +434,25 @@
     <div class="modal-body" id="requestsModalBody"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('requestsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ JOIN CONFIRMATION MODAL (Admin → Discover → Join) ============ -->
+<div class="modal-overlay" id="joinConfirmModal">
+  <div class="modal" style="max-width: 420px;">
+    <div class="modal-header">
+      <h2>Join this case?</h2>
+      <button class="icon-btn" onclick="closeModal('joinConfirmModal')">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="joinConfirmBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('joinConfirmModal')">Cancel</button>
+      <button class="btn btn-primary" id="joinConfirmBtn">Join Case</button>
     </div>
   </div>
 </div>

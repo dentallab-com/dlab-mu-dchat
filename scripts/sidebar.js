@@ -1,5 +1,5 @@
 // =============================================================================
-// SIDEBAR — chat list, search, pagination, view tabs, join requests
+// SIDEBAR — chat list, search, infinite scroll, view tabs, join requests
 // =============================================================================
 
 // ---------- Chat list rendering ----------
@@ -33,7 +33,6 @@ function renderChats() {
     : viewPool;
   const pool = filterPool(statusFiltered, search);
   renderChatListBody(pool, view, search, isAdmin);
-  renderPaginationFooter(pool.length);
 
   document.getElementById('whitelistBtn').style.display = isAdmin ? 'flex' : 'none';
 }
@@ -126,7 +125,7 @@ function renderArchivedToolbar(count) {
 
 function setStatusFilter(key) {
   STATE.statusFilter = key;
-  STATE.currentPage = 1;
+  resetChatScroll();
   hideFilterMenu();
   renderChats();
 }
@@ -183,15 +182,16 @@ function renderChatListBody(pool, view, search, isAdmin) {
   }
 
   let body = '';
+  let hasMore = false;
 
   if (pool.length > 0) {
-    const totalPages = Math.max(1, Math.ceil(pool.length / STATE.casesPerPage));
-    if (STATE.currentPage > totalPages) STATE.currentPage = totalPages;
-    const start = (STATE.currentPage - 1) * STATE.casesPerPage;
-    const paginated = pool.slice(start, start + STATE.casesPerPage);
-    body = paginated
+    if (STATE.visibleChats > pool.length) STATE.visibleChats = pool.length;
+    if (STATE.visibleChats < STATE.chatBatchSize) STATE.visibleChats = Math.min(STATE.chatBatchSize, pool.length);
+    const visible = pool.slice(0, STATE.visibleChats);
+    body = visible
       .map(c => view === 'discover' ? renderDiscoverItem(c) : renderJoinedItem(c))
       .join('');
+    hasMore = STATE.visibleChats < pool.length;
   }
 
   if (joinableMatches.length > 0) {
@@ -201,7 +201,43 @@ function renderChatListBody(pool, view, search, isAdmin) {
     `;
   }
 
+  if (hasMore) {
+    body += `<div class="chat-list-sentinel" id="chatListSentinel"></div>`;
+  }
+
   list.innerHTML = body;
+
+  if (hasMore) observeChatListSentinel();
+}
+
+// ---------- Infinite scroll ----------
+
+function resetChatScroll() {
+  STATE.visibleChats = STATE.chatBatchSize;
+  const list = document.getElementById('chatList');
+  if (list) list.scrollTop = 0;
+}
+
+let _chatListObserver = null;
+
+function observeChatListSentinel() {
+  const sentinel = document.getElementById('chatListSentinel');
+  if (!sentinel) return;
+
+  if (!_chatListObserver) {
+    _chatListObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          STATE.visibleChats += STATE.chatBatchSize;
+          renderChats();
+          break;
+        }
+      }
+    }, { root: document.getElementById('chatList'), rootMargin: '120px' });
+  }
+
+  _chatListObserver.disconnect();
+  _chatListObserver.observe(sentinel);
 }
 
 function findJoinableByExactId(search) {
@@ -231,25 +267,6 @@ function emptyChatListHtml(view, search, isAdmin) {
       ${body}${cta}
     </div>
   `;
-}
-
-function renderPaginationFooter(total) {
-  const totalPages = Math.max(1, Math.ceil(total / STATE.casesPerPage));
-
-  // Hide the pagination row entirely when there's only one page —
-  // a "1–6 of 6" with no next page is pure noise.
-  const wrap = document.getElementById('chatPagination');
-  if (totalPages <= 1) {
-    wrap.style.display = 'none';
-    return;
-  }
-  wrap.style.display = 'flex';
-
-  const start = (STATE.currentPage - 1) * STATE.casesPerPage;
-  document.getElementById('pageInfo').textContent =
-    `${total === 0 ? 0 : start + 1}–${Math.min(start + STATE.casesPerPage, total)} of ${total}`;
-  document.getElementById('prevPage').disabled = STATE.currentPage <= 1;
-  document.getElementById('nextPage').disabled = STATE.currentPage >= totalPages;
 }
 
 // ---------- Item renderers ----------
@@ -349,30 +366,96 @@ function renderDiscoverItem(c) {
   `;
 }
 
-// ---------- Pagination + view tabs ----------
+// ---------- View tabs ----------
 
 function switchView(v) {
   STATE.view = v;
   STATE.statusFilter = 'all';
-  STATE.currentPage = 1;
+  resetChatScroll();
   document.querySelectorAll('.view-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.view === v);
   });
   renderChats();
 }
 
-function changePage(delta) {
-  STATE.currentPage += delta;
-  renderChats();
-}
-
 // ---------- Join / request flow ----------
 
+// Admin-only entry point from the Discover list. Opens a confirmation modal
+// (with case info) instead of joining immediately — accidental clicks on a
+// dense list were silently adding the admin to unrelated cases.
 function directJoin(id) {
   const c = STATE.cases.find(c => c.id === id);
   if (!c) return;
+  // Already a member: skip the prompt and just open it.
+  if (c.members.some(m => m.email === STATE.currentUser.email)) {
+    openChat(id);
+    return;
+  }
+  openJoinConfirmModal(c);
+}
+
+function openJoinConfirmModal(c) {
+  const memberCount = c.members.length;
+  const avatarStack = c.members.slice(0, 5).map(m => `
+    <div class="avatar sm" style="background:${getColorForId(m.email)}; border:2px solid var(--surface); margin-left:-6px;" title="${m.name}">${m.avatar}</div>
+  `).join('');
+  const extra = memberCount > 5 ? `<span style="font-size:12px; color:var(--text-mute); margin-left:8px;">+${memberCount - 5} more</span>` : '';
+
+  document.getElementById('joinConfirmBody').innerHTML = `
+    <div style="display:flex; gap:14px; align-items:center; margin-bottom:18px;">
+      <div class="avatar lg" style="background:${getColorForId(c.id)}">${c.id.slice(-2)}</div>
+      <div style="min-width:0;">
+        <div style="font-size:15px; font-weight:700; margin-bottom:4px;">#${c.id}</div>
+        <div style="font-size:13px; color:var(--text-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title || '—'}</div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; font-size:13px;">
+      <div style="display:flex; justify-content:space-between; gap:12px;">
+        <span style="color:var(--text-mute);">Status</span>
+        <span>${statusPill(c.status, { sm: true })}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; gap:12px;">
+        <span style="color:var(--text-mute);">Patient</span>
+        <span style="color:var(--text);">${c.patient || '—'}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; gap:12px;">
+        <span style="color:var(--text-mute);">Doctor</span>
+        <span style="color:var(--text);">${c.doctor || 'No doctor assigned'}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; gap:12px;">
+        <span style="color:var(--text-mute);">Created</span>
+        <span style="color:var(--text);">${c.createdAt}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; gap:12px; align-items:center;">
+        <span style="color:var(--text-mute);">Members (${memberCount})</span>
+        <div style="display:flex; align-items:center;">
+          <div style="display:flex; padding-left:6px;">${avatarStack}</div>
+          ${extra}
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:12px; color:var(--text-mute); margin-top:18px; padding-top:14px; border-top:1px dashed var(--border);">
+      You'll be added as a member and other participants will see a system message.
+    </p>
+  `;
+
+  // Bind the confirm button fresh each open so it points at the current case.
+  document.getElementById('joinConfirmBtn').onclick = () => confirmDirectJoin(c.id);
+  document.getElementById('joinConfirmModal').classList.add('show');
+}
+
+function confirmDirectJoin(id) {
+  const c = STATE.cases.find(c => c.id === id);
+  if (!c) return;
   const u = STATE.currentUser;
-  if (c.members.some(m => m.email === u.email)) { openChat(id); return; }
+  // Re-check membership in case state changed while the modal was open.
+  if (c.members.some(m => m.email === u.email)) {
+    closeModal('joinConfirmModal');
+    openChat(id);
+    return;
+  }
   c.members.push({
     name: u.name,
     email: u.email,
@@ -383,6 +466,7 @@ function directJoin(id) {
   });
   c.joinRequests = (c.joinRequests || []).filter(r => r.email !== u.email);
   c.messages.push({ type: 'system', text: u.name + ' joined the case' });
+  closeModal('joinConfirmModal');
   showToast('Joined', `You joined #${c.id}.`, 'success');
   openChat(id);
 }
