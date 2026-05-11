@@ -7,6 +7,12 @@ function toggleInfoPanel() {
   document.getElementById('app').classList.toggle('with-info');
 }
 
+// Open-only variant used when the chat header title is clicked. We don't want
+// clicking the title to *close* an already-open panel — that surprised users.
+function openInfoPanel() {
+  document.getElementById('app').classList.add('with-info');
+}
+
 function renderInfoPanel() {
   const c = STATE.activeChat;
   if (!c) return;
